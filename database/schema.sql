@@ -10,9 +10,9 @@ CREATE TABLE "users" (
   "userID" serial PRIMARY KEY,
   "firstName" text,
   "lastName" text,
-  "userName" text,
+  "username" text,
   "hashedPassword" text,
-  "createdAt" timestamptz
+  "createdAt" timestamptz(3) default current_timestamp
 );
 
 CREATE TABLE "messages" (
