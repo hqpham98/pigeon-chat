@@ -2,6 +2,7 @@
 import 'dotenv/config';
 import express from 'express';
 import pg from 'pg';
+import argon, { argon2d } from 'argon2';
 import {
   ClientError,
   defaultMiddleware,
@@ -31,6 +32,28 @@ app.use(express.json());
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello, World!' });
+});
+
+app.get('/api/pigeon/', async (req, res) => {
+  const sql = `
+  SELECT * FROM "users"`;
+  const result = await db.query(sql);
+  res.json(result.rows);
+});
+
+app.post('/api/pigeon/signup', async (req, res, next) => {
+  try {
+    const { firstName, lastName, email, username, password } = req.body;
+    const sql = `
+    INSERT INTO "users" ("firstName", "lastName", "email", "username", "hashedPassword")
+    VALUES ($1, $2, $3, $4, $5);`;
+    const hashedPassword = await argon.hash(password);
+    const params = [firstName, lastName, email, username, hashedPassword];
+    await db.query(sql, params);
+    res.status(201).send();
+  } catch (err) {
+    next(err);
+  }
 });
 
 /*
