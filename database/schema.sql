@@ -10,6 +10,7 @@ CREATE TABLE "users" (
   "userID" serial PRIMARY KEY,
   "firstName" text,
   "lastName" text,
+  "email" text,
   "username" text,
   "hashedPassword" text,
   "createdAt" timestamptz(3) default current_timestamp

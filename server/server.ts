@@ -43,12 +43,12 @@ app.get('/api/pigeon/', async (req, res) => {
 
 app.post('/api/pigeon/signup', async (req, res, next) => {
   try {
-    const { firstName, lastName, username, password } = req.body;
+    const { firstName, lastName, email, username, password } = req.body;
     const sql = `
-    INSERT INTO "users" ("firstName", "lastName", "username", "hashedPassword")
-    VALUES ($1, $2, $3, $4);`;
+    INSERT INTO "users" ("firstName", "lastName", "email", "username", "hashedPassword")
+    VALUES ($1, $2, $3, $4, $5);`;
     const hashedPassword = await argon.hash(password);
-    const params = [firstName, lastName, username, hashedPassword];
+    const params = [firstName, lastName, email, username, hashedPassword];
     await db.query(sql, params);
     res.status(201).send();
   } catch (err) {

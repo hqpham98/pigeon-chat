@@ -1,16 +1,30 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 export function SignupForm() {
-  const [username, setUser] = useState();
-  const [password, setPass] = useState();
-  const [email, setEmail] = useState();
-  const [firstName, setFirstName] = useState();
-  const [lastName, setLastName] = useState();
-
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    try {
+      const res = await fetch('/api/pigeon/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData.entries())),
+      });
+      if (!res.ok) {
+        console.log('oops');
+      }
+      console.log('fetched');
+    } catch (err) {}
+  }
   return (
     <div className="flex bg-gray-700 min-h-screen justify-center">
-      <form className="bg-[#303338] w-[40rem] p-10 form-control self-center rounded-md shadow-xl shadow-gray-800">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[#303338] w-[40rem] p-10 form-control self-center rounded-md shadow-xl shadow-gray-800">
         <h1 className="text-white text-2xl font-bold text-center">
           Create an account
         </h1>
