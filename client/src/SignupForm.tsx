@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 export function SignupForm() {
