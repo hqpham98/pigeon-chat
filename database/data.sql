@@ -11,4 +11,10 @@
 --      ('Get a job', false);
 
 INSERT INTO "users" ("firstName", "lastName", "email", "username", "hashedPassword")
-VALUES ('Bobby', 'Lee', 'taco@gmail.com', 'username', 'p=1$dn8fwJtkkn9hyFjjuVyJRA$3+HUcwvjjl8/miAVYS/6xBwCdhsC7IBn6bZpjg3CAE8'), ('Daniel', 'Hahn', 'daniel@gmail.com', 'daniel', 'p=1$qoLuq7zPtGOfIcNHPbG2JA$vSSWqYcMPY0x4tmBGC7SMtFfsmljS4LjK5ud/fWutjE');
+VALUES ('Bobby', 'Lee', 'taco@gmail.com', 'username', '$argon2i$v=19$m=4096,t=3,p=1$drFII7yZuHIyUFi8H+ei/A$0qzEImYgUE97RaUS4e+dh8mtxWibq3vmmU0FWABsnEE'), ('Daniel', 'Hahn', 'daniel@gmail.com', 'daniel', '$argon2i$v=19$m=4096,t=3,p=1$z/IkOSC2DK4CWnUCHXzZPw$cNT9DzeyEAcjVDCrucowQJScHwGHo0wPTmyvpTcPhxg');
+
+INSERT INTO "friendships" ("userID1", "userID2")
+VALUES (1, 2), (2, 1);
+
+INSERT INTO "conversations" ("conversationID", "userID")
+VALUES ('TestConvo', 1), ('TestConvo', 2);

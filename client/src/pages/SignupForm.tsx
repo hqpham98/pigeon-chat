@@ -1,7 +1,9 @@
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export function SignupForm() {
+  const [message, setMessage] = useState('');
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -15,16 +17,19 @@ export function SignupForm() {
         body: JSON.stringify(Object.fromEntries(formData.entries())),
       });
       if (!res.ok) {
-        console.log('oops');
+        throw new Error(`Oops. Response Code: ${res.status}`);
       }
-      console.log('fetched');
-    } catch (err) {}
+      setMessage('Account successfully created. You may now login.');
+    } catch (err) {
+      setMessage('' + (err as Error).message);
+    }
   }
   return (
     <div className="flex bg-gray-700 min-h-screen justify-center">
       <form
         onSubmit={handleSubmit}
         className="bg-[#303338] w-[40rem] p-10 form-control self-center rounded-md shadow-xl shadow-gray-800">
+        {message && <p className="text-red-500">{message}</p>}
         <h1 className="text-white text-2xl font-bold text-center">
           Create an account
         </h1>
