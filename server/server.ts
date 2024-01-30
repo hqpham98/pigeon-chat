@@ -52,9 +52,34 @@ app.get('/api/pigeon/conversations/:userID', async (req, res) => {
    WHERE "userID" = $1`;
   const params = [userID];
   const result = await db.query(sql, params);
+  res.json(result.rows);
+});
+
+//Get all messages in a conversations
+app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
+  const { conversationID } = req.params;
+  const sql = `
+  SELECT *
+  FROM "messages"
+  WHERE "conversationID" = $1`;
+  const params = [conversationID];
+  const result = await db.query(sql, params);
   res.send(result.rows);
 });
 
+//Send message in a conversation
+app.post('/api/pigeon/messages/:conversationID/:userID', async (req, res) => {
+  const { conversationID, userID } = req.params;
+  console.log('req.body', req.body);
+  const sql = `
+    INSERT INTO "messages" ("conversationID", "userID", "messageContent")
+    VALUES ($1, $2, $3)`;
+  const params = [conversationID, userID, req.body.test];
+  const result = await db.query(sql, params);
+  res.send();
+});
+
+//Login
 app.post('/api/pigeon/login', async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -80,6 +105,7 @@ app.post('/api/pigeon/login', async (req, res, next) => {
   }
 });
 
+//Signup
 app.post('/api/pigeon/signup', async (req, res, next) => {
   try {
     const { firstName, lastName, email, username, password } = req.body;

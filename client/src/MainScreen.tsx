@@ -10,25 +10,25 @@ export function MainScreen() {
   const [friends, setFriends] = useState('');
   const [convLoaded, setConvLoaded] = useState(false);
   const [chatLoaded, setChatLoaded] = useState(false);
+  const appContext = useContext(AppContext);
 
   useEffect(() => {
     async function getConversations() {
-      const res = await fetch(
-        `/api/pigeon/conversations/${appContext.user?.userID}`
-      );
-      const convos = JSON.parse(await res.json());
-      const temp = convos.map((convo) => <li>conversationID: {convo}</li>);
-      setConversations(temp);
-      setConvLoaded(true);
+      try {
+        const res = await fetch(
+          `/api/pigeon/conversations/${appContext.user?.userID}`
+        );
+        const convos = await res.json();
+        console.log('convos', convos);
+        const temp = convos.map((convo) => <li>{convo.conversationID}</li>);
+        setConversations(temp);
+        setConvLoaded(true);
+      } catch (err) {
+        console.log(err);
+      }
     }
-    // async function getChat() {
-    //   const res = await fetch(
-    //     `/api/pigeon/conversations/${appContext.user?.userID}`
-    //   );
-    // }
-
     async function getFriends() {}
-
+    getConversations();
     setSocket(io('http://localhost:8080'));
     if (socket) {
       socket.io.on('error', (error) => {
@@ -40,8 +40,6 @@ export function MainScreen() {
     };
   }, []);
 
-  const appContext = useContext(AppContext);
-
   function handleClick() {
     socket?.emit(
       'message',
@@ -50,17 +48,17 @@ export function MainScreen() {
     setMessage('');
   }
 
-  if (!(convLoaded && chatLoaded)) return null;
+  if (!convLoaded) return null;
 
   return (
     <div>
-      <h1>Conversations</h1>
+      <h1 className="font-bold">Conversations</h1>
       <ol>{conversations}</ol>
-      <h1>Friends</h1>
+      <h1 className="font-bold">Friends</h1>
       <ol>{friends}</ol>
-      <h1>Chat</h1>
+      <h1 className="font-bold">Chat</h1>
       <ol>{chat}</ol>
-      <h1>Messaging {}</h1>
+      <h1 className="font-bold">Messaging {}</h1>
       <input
         className="input input-bordered"
         name="message"
