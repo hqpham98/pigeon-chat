@@ -6,6 +6,7 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
+import { Message, SocketClientDict, SocketClient } from './lib/types';
 
 import {
   ClientError,
@@ -35,6 +36,9 @@ const io = new Server(server, {
   },
 });
 
+//List of active socket connections
+const socketClientDict: SocketClientDict = {};
+
 // Create paths for static directories
 const reactStaticDir = new URL('../client/dist', import.meta.url).pathname;
 const uploadsStaticDir = new URL('public', import.meta.url).pathname;
@@ -44,12 +48,13 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-//Get all conversations involving self
+//Get all conversations involving userID
 app.get('/api/pigeon/conversations/:userID', async (req, res) => {
   const { userID } = req.params;
-  const sql = `SELECT "conversationID"
-   FROM "conversations"
-   WHERE "userID" = $1`;
+  const sql = `
+    SELECT "conversationID"
+    FROM "conversations"
+    WHERE "userID" = $1`;
   const params = [userID];
   const result = await db.query(sql, params);
   res.json(result.rows);
@@ -59,24 +64,25 @@ app.get('/api/pigeon/conversations/:userID', async (req, res) => {
 app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
   const { conversationID } = req.params;
   const sql = `
-  SELECT *
-  FROM "messages"
-  WHERE "conversationID" = $1`;
+    SELECT *
+    FROM "messages"
+    WHERE "conversationID" = $1`;
   const params = [conversationID];
   const result = await db.query(sql, params);
-  res.send(result.rows);
+  res.json(result.rows);
 });
 
-//Send message in a conversation
-app.post('/api/pigeon/messages/:conversationID/:userID', async (req, res) => {
-  const { conversationID, userID } = req.params;
-  console.log('req.body', req.body);
+//Get all friends (userID and firstName) for userID
+app.get('/api/pigeon/friendships/:userID', async (req, res) => {
+  const { userID } = req.params;
   const sql = `
-    INSERT INTO "messages" ("conversationID", "userID", "messageContent")
-    VALUES ($1, $2, $3)`;
-  const params = [conversationID, userID, req.body.test];
+    SELECT "friendships"."userID2", "users"."firstName"
+    FROM "friendships"
+    JOIN "users" ON "friendships"."userID2" = "users"."userID"
+    WHERE "friendships"."userID1" = $1`;
+  const params = [userID];
   const result = await db.query(sql, params);
-  res.send();
+  res.json(result.rows);
 });
 
 //Login
@@ -131,13 +137,35 @@ app.use(defaultMiddleware(reactStaticDir));
 
 app.use(errorMiddleware);
 
+//Create socket server listener
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
-  socket.on('message', (msg) => {
-    console.log('message', msg);
+
+  //Listen for new messages
+  //Update DB
+  socket.on('chat-message', async (msg: Message) => {
+    const { conversationID, userID, username, messageContent } = msg;
+    //Notify the server that message body is received
+    console.log(`message from ${username}`);
+    let sql = `
+    INSERT INTO "messages" ("conversationID", "userID", "messageContent")
+    VALUES ($1, $2, $3)`;
+    let params = [
+      conversationID,
+      userID,
+      `Message from ${username} ` + messageContent,
+    ];
+    await db.query(sql, params);
+
+    //Get conversation userID's, If match active SocketClient userID's, emit to them
+    sql = `
+      SELECT "userID"
+      FROM "conversations"
+      WHERE "conversationID" = $1`;
+    params = [conversationID];
   });
 });
 
