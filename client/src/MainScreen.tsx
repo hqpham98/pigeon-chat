@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../src/components/AppContext';
-import { MessagePayload } from './lib/api';
+import { MessagePayload, SocketPayload } from './lib/api';
 
 export function MainScreen() {
   const [socket, setSocket] = useState<Socket>();
@@ -12,10 +12,12 @@ export function MainScreen() {
   const [friendsList, setFriendsList] = useState([]);
   const [convosLoaded, setConvosLoaded] = useState(false);
   const [friendsLoaded, setFriendsLoaded] = useState(false);
+  const [chatLoaded, setChatLoaded] = useState(false);
+  const [messageReceived, setMessageReceived] = useState(false);
   const appContext = useContext(AppContext);
 
   useEffect(() => {
-    //Load Conversations
+    //Load Conversations on mount
     async function getConversations() {
       try {
         const res = await fetch(
@@ -37,7 +39,7 @@ export function MainScreen() {
       }
     }
 
-    //Load Friends List
+    //Load Friends List on mount
     async function getFriends() {
       try {
         const res = await fetch(
@@ -46,11 +48,7 @@ export function MainScreen() {
         //
         const friends = await res.json();
         //userID, firstName, lastName, username, add types later
-        const temp = friends.map((friend) => (
-          <li>
-            {friend.firstName} {friend.lastName}
-          </li>
-        ));
+        const temp = friends.map((friend) => <li>{friend.firstName}</li>);
         setFriendsList(temp);
         console.log('friends', temp);
         setFriendsLoaded(true);
@@ -58,19 +56,61 @@ export function MainScreen() {
         console.log(err);
       }
     }
-    getConversations();
     getFriends();
+    getConversations();
+    //Initialize socket on mount
     setSocket(io('http://localhost:8080'));
-    if (socket) {
-      socket.io.on('error', (error) => {
-        console.log(error);
-      });
-    }
     return () => {
       socket?.disconnect();
       setSocket(undefined);
     };
   }, []);
+
+  //Add event listeners to socket
+  useEffect(() => {
+    //send userID to server
+    if (!socket) return;
+    socket.on('socket-init-request', () => {
+      const payload = { userID: appContext.user?.userID, socketID: socket.id };
+      socket.emit('socket-init-response', payload);
+    });
+    //Refresh chat if receive server update if current convo
+    socket.on('message-received', (convoID) => {
+      console.log('current convo', currentConvo);
+      console.log('convoID', convoID);
+
+      if (currentConvo === convoID) {
+        console.log('def received');
+        setMessageReceived((prev) => !prev);
+      }
+    });
+    socket.onAny((event) => {
+      console.log('listened to event: ', event);
+    });
+    return () => {
+      socket.off();
+    };
+  }, [socket, currentConvo]);
+
+  //Load chat everytime convo view is changed or update received
+  useEffect(() => {
+    //Load chat from current convo
+    console.log('should get chat');
+    async function getChat() {
+      try {
+        const res = await fetch(`/api/pigeon/messages/${currentConvo}`);
+        const messages = await res.json();
+        const temp = messages.map((msg) => <li>{msg.messageContent}</li>);
+        setChat(temp);
+        setChatLoaded(true);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (currentConvo) {
+      getChat();
+    }
+  }, [currentConvo, messageReceived]);
 
   //Send message with message payload
   function handleClick() {
@@ -80,7 +120,6 @@ export function MainScreen() {
       messageContent: message,
     };
     socket?.emit('chat-message', payload);
-    console.log('sent payload');
     setMessage('');
   }
 

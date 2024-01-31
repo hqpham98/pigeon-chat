@@ -12,3 +12,8 @@ export type MessagePayload = {
   username: string;
   conversationID: string;
 };
+
+export type SocketPayload = {
+  userID: number;
+  id: number;
+};

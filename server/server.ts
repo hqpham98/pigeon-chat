@@ -54,19 +54,21 @@ app.get('/api/pigeon/conversations/:userID', async (req, res) => {
   const sql = `
     SELECT "conversationID"
     FROM "conversations"
-    WHERE "userID" = $1`;
+    WHERE "userID" = $1;`;
   const params = [userID];
   const result = await db.query(sql, params);
   res.json(result.rows);
 });
 
-//Get all messages in a conversations
+//Get all messages in a conversation
 app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
   const { conversationID } = req.params;
   const sql = `
-    SELECT *
+    SELECT "messages"."messageContent", "messages"."timestamp", "messages"."userID", "users"."firstName"
     FROM "messages"
-    WHERE "conversationID" = $1`;
+    JOIN "users" ON "users"."userID" = "messages"."userID"
+    WHERE "messages"."conversationID" = $1
+    ORDER by "timestamp" ASC;`;
   const params = [conversationID];
   const result = await db.query(sql, params);
   res.json(result.rows);
@@ -79,7 +81,7 @@ app.get('/api/pigeon/friendships/:userID', async (req, res) => {
     SELECT "friendships"."userID2", "users"."firstName"
     FROM "friendships"
     JOIN "users" ON "friendships"."userID2" = "users"."userID"
-    WHERE "friendships"."userID1" = $1`;
+    WHERE "friendships"."userID1" = $1;`;
   const params = [userID];
   const result = await db.query(sql, params);
   res.json(result.rows);
@@ -92,7 +94,7 @@ app.post('/api/pigeon/login', async (req, res, next) => {
     const sql = `
     SELECT "userID", "hashedPassword"
     FROM "users"
-    WHERE "username"=$1`;
+    WHERE "username"=$1;`;
     const params = [username];
     const result = await db.query(sql, params);
     const [user] = result.rows;
@@ -139,7 +141,13 @@ app.use(errorMiddleware);
 
 //Create socket server listener
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('user connected');
+  io.to(socket.id).emit('socket-init-request', 'hello');
+  // Add socket to client list
+  socket.on('socket-init-response', (client) => {
+    socketClientDict['' + client.userID] = client.socketID;
+    console.log(`hello ${client.userID}`);
+  });
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
@@ -166,6 +174,11 @@ io.on('connection', (socket) => {
       FROM "conversations"
       WHERE "conversationID" = $1`;
     params = [conversationID];
+    const result = await db.query(sql, params);
+    for (let i = 0; i < result.rows.length; i++) {
+      const socketID = socketClientDict['' + result.rows[i].userID];
+      io.to('' + socketID).emit('message-received', conversationID);
+    }
   });
 });
 

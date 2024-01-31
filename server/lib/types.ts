@@ -4,3 +4,5 @@ export type Message = {
   conversationID: string;
   messageContent: string;
 };
+
+export type SocketClientDict = Record<string, number>;
