@@ -6,6 +6,7 @@ import {
   FaUserPlus,
 } from 'react-icons/fa6';
 import { View } from '../lib/types';
+import { UserEntry } from './UserEntry';
 
 type SideProps = {
   view: View;
