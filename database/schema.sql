@@ -21,7 +21,7 @@ CREATE TABLE "messages" (
   "conversationID" text,
   "userID" integer,
   "messageContent" text,
-  "timestamp" timestamptz
+  "timestamp" timestamptz(3) default current_timestamp
 );
 
 CREATE TABLE "conversations" (
@@ -40,7 +40,7 @@ CREATE TABLE "requests" (
   "requestID" serial PRIMARY KEY,
   "senderID" integer,
   "receiverID" integer,
-  "timestamp" timestamptz
+  "timestamp" timestamptz(3) default current_timestamp
 );
 
 ALTER TABLE "conversations" ADD FOREIGN KEY ("userID") REFERENCES "users" ("userID");

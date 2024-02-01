@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { User, Auth } from '../lib/api';
+import { User, Auth } from '../lib/types';
 
 type AppContextValues = {
   user: User | undefined;

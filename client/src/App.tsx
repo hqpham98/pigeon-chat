@@ -4,9 +4,10 @@ import { LandingPage } from './pages/LandingPage';
 import { SignupForm } from './pages/SignupForm';
 import { SigninForm } from './pages/SigninForm';
 import { Route, Routes } from 'react-router-dom';
-import { User, Auth } from './lib/api';
+import { User, Auth } from './lib/types';
 import { AppContext } from './components/AppContext';
 import { MainScreen } from './MainScreen';
+import { Home } from './pages/Home';
 import { useEffect, useState } from 'react';
 
 export default function App() {
@@ -46,7 +47,7 @@ export default function App() {
   return (
     <AppContext.Provider value={contextValue}>
       <Routes>
-        <Route path="/" element={loggedIn ? <MainScreen /> : <LandingPage />} />
+        <Route path="/" element={loggedIn ? <Home /> : <LandingPage />} />
         <Route path="/register" element={<SignupForm />} />
         <Route path="/login" element={<SigninForm />} />
       </Routes>

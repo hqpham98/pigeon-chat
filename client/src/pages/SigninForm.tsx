@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { FormEvent, useState, useContext, useEffect } from 'react';
 import { AppContext } from '../components/AppContext';
-import { Auth } from '../lib/api';
+import { Auth } from '../lib/types';
 
 export function SigninForm() {
   const [message, setMessage] = useState('');

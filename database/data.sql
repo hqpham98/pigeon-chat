@@ -17,4 +17,7 @@ INSERT INTO "friendships" ("userID1", "userID2")
 VALUES (1, 2), (2, 1);
 
 INSERT INTO "conversations" ("conversationID", "userID")
-VALUES ('TestConvo', 1), ('TestConvo', 2);
+VALUES ('Convo1', 1), ('Convo1', 2);
+
+INSERT INTO "conversations" ("conversationID", "userID")
+VALUES ('Convo2', 1), ('Convo2', 2);
