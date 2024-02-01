@@ -71,6 +71,7 @@ app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
     ORDER by "timestamp" ASC;`;
   const params = [conversationID];
   const result = await db.query(sql, params);
+  console.log('received get');
   res.json(result.rows);
 });
 
@@ -78,7 +79,7 @@ app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
 app.get('/api/pigeon/friendships/:userID', async (req, res) => {
   const { userID } = req.params;
   const sql = `
-    SELECT "friendships"."userID2", "users"."firstName"
+    SELECT "friendships"."userID2" as "userID", "users"."firstName"
     FROM "friendships"
     JOIN "users" ON "friendships"."userID2" = "users"."userID"
     WHERE "friendships"."userID1" = $1;`;

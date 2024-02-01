@@ -18,4 +18,20 @@ export type SocketPayload = {
   id: number;
 };
 
+export type Friend = {
+  //add display name later
+  userID: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+};
+
+export type Conversation = {
+  //add conversationName later
+  conversationID: string;
+};
+export type ConversationList = Conversation[];
+
+export type ConversationID = string;
+
 export type View = 'Chats' | 'Friends' | 'Requests';
