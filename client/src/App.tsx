@@ -4,7 +4,7 @@ import { LandingPage } from './pages/LandingPage';
 import { SignupForm } from './pages/SignupForm';
 import { SigninForm } from './pages/SigninForm';
 import { Route, Routes } from 'react-router-dom';
-import { User, Auth } from './lib/api';
+import { User, Auth } from './lib/types';
 import { AppContext } from './components/AppContext';
 import { MainScreen } from './MainScreen';
 import { Home } from './pages/Home';

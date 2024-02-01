@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../src/components/AppContext';
-import { MessagePayload, SocketPayload } from './lib/api';
+import { MessagePayload, SocketPayload } from './lib/types';
 
 export function MainScreen() {
   const [socket, setSocket] = useState<Socket>();

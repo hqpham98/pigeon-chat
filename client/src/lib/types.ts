@@ -17,3 +17,5 @@ export type SocketPayload = {
   userID: number;
   id: number;
 };
+
+export type View = 'Chats' | 'Friends' | 'Requests';
