@@ -91,9 +91,7 @@ export function Home() {
         //
         const friends = await res.json();
         console.log('friends', friends);
-        //userID, firstName, lastName, username, add types later
-        const temp = friends.map((friend) => <li>{friend.firstName}</li>);
-        setFriends(temp);
+        setFriends(friends);
         setFriendsLoaded(true);
       } catch (err) {
         //Fix error reporting
@@ -111,8 +109,6 @@ export function Home() {
       try {
         const res = await fetch(`/api/pigeon/messages/${currentChat}`);
         const messages = await res.json();
-        // console.log('messages', messages);
-        // const temp = messages.map((msg) => <li>{msg.messageContent}</li>);
         setCurrentMessages(messages);
         setCurrentChatLoaded(true);
       } catch (err) {

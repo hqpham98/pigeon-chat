@@ -19,7 +19,6 @@ export function SidePanel({ view, changeView }: SideProps) {
   const homeContext: HomeContextValues = useContext(HomeContext);
   return (
     // Container
-
     <div>
       {/* Header */}
       <div className="h-14 py-2 px-4 border-solid border-[#2E3034] border-b-2 flex">
@@ -124,7 +123,7 @@ function PanelBody({ view, changeView, homeContext }: PanelProps) {
           setCurrentChat(chat.conversationID);
         }}
         className={
-          'mx-auto basis-[100%] my-2 py-2 w-full font-medium text-[20px] rounded-md text-[#ADADAD] hover:bg-[#424549] hover:text-white cursor-pointer  ' +
+          'mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] rounded-md text-[#ADADAD] hover:bg-[#424549] hover:text-white cursor-pointer  ' +
           (currentChat === chat.conversationID ? 'bg-[#424549]' : '')
         }>
         {chat.conversationID}
@@ -135,7 +134,11 @@ function PanelBody({ view, changeView, homeContext }: PanelProps) {
   }
   if (view === 'Friends') {
     const result = friends.map((f: Friend) => (
-      <div key={f.userID}>{f.firstName}</div>
+      <div
+        key={f.userID}
+        className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] rounded-md text-[#ADADAD] hover:bg-[#424549] hover:text-white cursor-pointer">
+        {f.firstName + ' asdasdasd'}
+      </div>
     ));
     return <div className="px-2 py-1">{result}</div>;
   }
