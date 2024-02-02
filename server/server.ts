@@ -34,9 +34,9 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin:
-      process.env.RUN_ENV === 'development'
-        ? 'http://localhost:5173'
-        : 'https://www.pigeonchat.xyz/',
+      process.env.NODE_ENV === 'production'
+        ? 'https://www.pigeonchat.xyz/'
+        : 'http://localhost:5173',
   },
 });
 
