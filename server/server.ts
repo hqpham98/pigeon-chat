@@ -79,7 +79,7 @@ app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
 app.get('/api/pigeon/friendships/:userID', async (req, res) => {
   const { userID } = req.params;
   const sql = `
-    SELECT "friendships"."userID2" as "userID", "users"."firstName"
+    SELECT "friendships"."userID2" as "userID", "users"."username", "users"."firstName", "users"."lastName"
     FROM "friendships"
     JOIN "users" ON "friendships"."userID2" = "users"."userID"
     WHERE "friendships"."userID1" = $1;`;

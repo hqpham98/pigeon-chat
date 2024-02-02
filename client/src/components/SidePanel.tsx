@@ -5,9 +5,9 @@ import {
   FaRegBell,
   FaUserPlus,
 } from 'react-icons/fa6';
-import { View, Conversation } from '../lib/types';
+import { View, Conversation, Friend } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { PanelEntry } from './PanelEntry';
 
 type SideProps = {
@@ -16,6 +16,7 @@ type SideProps = {
 };
 
 export function SidePanel({ view, changeView }: SideProps) {
+  const homeContext: HomeContextValues = useContext(HomeContext);
   return (
     // Container
 
@@ -32,7 +33,11 @@ export function SidePanel({ view, changeView }: SideProps) {
       </div>
       {/* Panel Body */}
       <div className="py-2 px-4">
-        <PanelBody view={view} changeView={changeView} />
+        <PanelBody
+          view={view}
+          changeView={changeView}
+          homeContext={homeContext}
+        />
       </div>
     </div>
   );
@@ -93,8 +98,13 @@ function HeaderButtons({ view, changeView }: SideProps) {
   }
 }
 
-function PanelBody({ view, changeView }: SideProps) {
-  const homeContext: HomeContextValues = useContext(HomeContext);
+type PanelProps = {
+  view: View;
+  changeView: (v: View) => void;
+  homeContext: HomeContextValues;
+};
+
+function PanelBody({ view, changeView, homeContext }: PanelProps) {
   const {
     currentChat,
     chats,
@@ -103,16 +113,30 @@ function PanelBody({ view, changeView }: SideProps) {
     chatsLoaded,
     friendsLoaded,
     messageEvent,
+    setCurrentChat,
   } = homeContext;
+
   if (view === 'Chats') {
     const result = chats.map((chat: Conversation) => (
       <div
         key={chat.conversationID}
-        className="mx-auto basis-[100%] my-2 py-2 w-full font-medium text-[20px] rounded-md text-[#ADADAD] hover:bg-[#424549] hover:text-white cursor-pointer">
-        <span>{chat.conversationID}</span>
+        onClick={(event) => {
+          setCurrentChat(chat.conversationID);
+        }}
+        className={
+          'mx-auto basis-[100%] my-2 py-2 w-full font-medium text-[20px] rounded-md text-[#ADADAD] hover:bg-[#424549] hover:text-white cursor-pointer  ' +
+          (currentChat === chat.conversationID ? 'bg-[#424549]' : '')
+        }>
+        {chat.conversationID}
       </div>
     ));
 
+    return <div className="px-2 py-1">{result}</div>;
+  }
+  if (view === 'Friends') {
+    const result = friends.map((f: Friend) => (
+      <div key={f.userID}>{f.firstName}</div>
+    ));
     return <div className="px-2 py-1">{result}</div>;
   }
 }

@@ -9,6 +9,7 @@ import { HomeContext, HomeContextValues } from '../components/HomeContext';
 
 export function Home() {
   const [sideView, setSideView] = useState<View>('Chats');
+  const [currentMessages, setCurrentMessages] = useState();
   const [currentChat, setCurrentChat] = useState<ConversationID>('');
   const [chats, setChats] = useState([]); //create a conversationName in the db, not just id
   const [friends, setFriends] = useState([]);
@@ -110,9 +111,9 @@ export function Home() {
       try {
         const res = await fetch(`/api/pigeon/messages/${currentChat}`);
         const messages = await res.json();
-        console.log('messages', messages);
-        const temp = messages.map((msg) => <li>{msg.messageContent}</li>);
-        setCurrentChat(temp);
+        // console.log('messages', messages);
+        // const temp = messages.map((msg) => <li>{msg.messageContent}</li>);
+        setCurrentMessages(messages);
         setCurrentChatLoaded(true);
       } catch (err) {
         console.log(err);
