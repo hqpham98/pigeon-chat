@@ -123,6 +123,7 @@ export function Home() {
 
   const contextValue: HomeContextValues = {
     message,
+    setMessage,
     currentChat,
     currentMessages,
     chats,
@@ -132,6 +133,7 @@ export function Home() {
     friendsLoaded,
     messageEvent,
     setCurrentChat,
+    socket,
   };
   return (
     <HomeContext.Provider value={contextValue}>

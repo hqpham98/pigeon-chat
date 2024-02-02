@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { Message, SocketClientDict } from './lib/types';
-//fix types
+// fix types
 
 import {
   ClientError,
@@ -37,7 +37,7 @@ const io = new Server(server, {
   },
 });
 
-//List of active socket connections
+// List of active socket connections
 const socketClientDict: SocketClientDict = {};
 
 // Create paths for static directories
@@ -49,7 +49,7 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-//Get all conversations involving userID
+// Get all conversations involving userID
 app.get('/api/pigeon/conversations/:userID', async (req, res) => {
   const { userID } = req.params;
   const sql = `
@@ -61,11 +61,11 @@ app.get('/api/pigeon/conversations/:userID', async (req, res) => {
   res.json(result.rows);
 });
 
-//Get all messages in a conversation
+// Get all messages in a conversation
 app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
   const { conversationID } = req.params;
   const sql = `
-    SELECT "messages"."messageContent", "messages"."timestamp", "messages"."userID", "users"."firstName"
+    SELECT "messages"."messageID", "messages"."messageContent", "messages"."timestamp", "messages"."userID", "users"."username", "users"."firstName", "users"."lastName"
     FROM "messages"
     JOIN "users" ON "users"."userID" = "messages"."userID"
     WHERE "messages"."conversationID" = $1
@@ -76,7 +76,7 @@ app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
   res.json(result.rows);
 });
 
-//Get all friends (userID and firstName) for userID
+// Get all friends (userID and firstName) for userID
 app.get('/api/pigeon/friendships/:userID', async (req, res) => {
   const { userID } = req.params;
   const sql = `
@@ -89,7 +89,7 @@ app.get('/api/pigeon/friendships/:userID', async (req, res) => {
   res.json(result.rows);
 });
 
-//Login
+// Login
 app.post('/api/pigeon/login', async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -115,7 +115,7 @@ app.post('/api/pigeon/login', async (req, res, next) => {
   }
 });
 
-//Signup
+// Signup
 app.post('/api/pigeon/signup', async (req, res, next) => {
   try {
     const { firstName, lastName, email, username, password } = req.body;
@@ -141,7 +141,7 @@ app.use(defaultMiddleware(reactStaticDir));
 
 app.use(errorMiddleware);
 
-//Create socket server listener
+// Create socket server listener
 io.on('connection', (socket) => {
   console.log('user connected');
   io.to(socket.id).emit('socket-init-request', 'hello');
@@ -154,11 +154,11 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 
-  //Listen for new messages
-  //Update DB
+  // Listen for new messages
+  // Update DB
   socket.on('chat-message', async (msg: Message) => {
     const { conversationID, userID, username, messageContent } = msg;
-    //Notify the server that message body is received
+    // Notify the server that message body is received
     console.log(`message from ${username}`);
     let sql = `
     INSERT INTO "messages" ("conversationID", "userID", "messageContent")
@@ -170,7 +170,7 @@ io.on('connection', (socket) => {
     ];
     await db.query(sql, params);
 
-    //Get conversation userID's, If match active SocketClient userID's, emit to them
+    // Get conversation userID's, If match active SocketClient userID's, emit to them
     sql = `
       SELECT "userID"
       FROM "conversations"
@@ -185,5 +185,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(process.env.PORT, () => {
-  process.stdout.write(`\n\server listening on port ${process.env.PORT}\n\n`);
+  process.stdout.write(`\nserver listening on port ${process.env.PORT}\n\n`);
 });

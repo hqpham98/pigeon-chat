@@ -26,7 +26,16 @@ export type Friend = {
   lastName: string;
 };
 
-export type Message = {};
+export type Message = {
+  messageID: string;
+  messageContent: string;
+  userID: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  timestamp: string;
+};
+
 export type Conversation = {
   //add conversationName later
   conversationID: string;

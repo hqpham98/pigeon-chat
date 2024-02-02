@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import { User, Auth } from '../lib/types';
 
-type AppContextValues = {
+export type AppContextValues = {
   user: User | undefined;
   token: string | undefined;
   handleSignIn: (auth: Auth) => void;

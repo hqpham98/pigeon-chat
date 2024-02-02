@@ -29,7 +29,7 @@ export function SidePanel({ view, changeView }: SideProps) {
         </div>
       </div>
       {/* Panel Body */}
-      <div className="py-2 px-4">
+      <div className="py-2 px-4 overflow-auto">
         <PanelBody view={view} />
       </div>
     </div>

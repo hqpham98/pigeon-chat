@@ -1,5 +1,7 @@
-import { useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { HomeContext, HomeContextValues } from './HomeContext';
+import { Message } from '../lib/types';
+import { AppContext, AppContextValues } from './AppContext';
 
 export function MainPanel() {
   const homeContext: HomeContextValues = useContext(HomeContext);
@@ -24,15 +26,47 @@ export function MainPanel() {
 
 function MessageArea() {
   const homeContext: HomeContextValues = useContext(HomeContext);
-  return <div className="h-full"></div>;
+  const { currentMessages } = homeContext;
+  const result = currentMessages.map((msg: Message) => (
+    <div className="text-white" key={msg.messageID}>
+      {msg.messageContent}
+    </div>
+  ));
+  return (
+    <div className="h-full overflow-auto p-4">
+      <ol>{result}</ol>
+    </div>
+  );
 }
+
 function InputArea() {
+  const appContext: AppContextValues = useContext(AppContext);
   const homeContext: HomeContextValues = useContext(HomeContext);
+  const { currentChat, message, setMessage, socket } = homeContext;
+
+  function sendMessage() {
+    const payload = {
+      ...appContext.user,
+      conversationID: currentChat,
+      messageContent: message,
+    };
+    socket.emit('chat-message', payload);
+    setMessage('');
+  }
   return (
     <div className="min-h-[4.5rem] flex p-4">
       <input
         type="text"
-        placeholder={`Message ${homeContext.currentChat}`}
+        placeholder={`Message ${currentChat}`}
+        onChange={(event) => {
+          setMessage(event.currentTarget.value);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.currentTarget.value = '';
+            sendMessage();
+          }
+        }}
         className="bg-[#424549] placeholder:text-[#ADADAD] text-white p-2 h-full m-auto w-full rounded focus:outline-none"></input>
     </div>
   );
