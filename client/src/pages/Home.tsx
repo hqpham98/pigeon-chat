@@ -23,7 +23,12 @@ export function Home() {
   //Initialize Socket on mount
   useEffect(() => {
     console.log('socket initialized');
-    setSocket(io());
+    if (process.env.NODE_ENV === 'production') {
+      setSocket(io());
+    } else {
+      setSocket(io('http://localhost:8080'));
+    }
+
     return () => {
       socket?.disconnect();
       setSocket(undefined);
