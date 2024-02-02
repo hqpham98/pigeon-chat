@@ -3,13 +3,13 @@ import { useState, useEffect, useContext } from 'react';
 import { View, ConversationID, SocketPayload } from '../lib/types';
 import { MainPanel } from '../components/MainPanel';
 import { SidePanel } from '../components/SidePanel';
-import { PanelEntry } from '../components/PanelEntry';
 import { AppContext } from '../components/AppContext';
 import { HomeContext, HomeContextValues } from '../components/HomeContext';
 
 export function Home() {
   const [sideView, setSideView] = useState<View>('Chats');
-  const [currentMessages, setCurrentMessages] = useState();
+  const [message, setMessage] = useState('');
+  const [currentMessages, setCurrentMessages] = useState([]);
   const [currentChat, setCurrentChat] = useState<ConversationID>('');
   const [chats, setChats] = useState([]); //create a conversationName in the db, not just id
   const [friends, setFriends] = useState([]);
@@ -122,14 +122,16 @@ export function Home() {
   if (!(chatsLoaded && friendsLoaded)) return null;
 
   const contextValue: HomeContextValues = {
+    message,
     currentChat,
-    setCurrentChat,
+    currentMessages,
     chats,
     friends,
     currentChatLoaded,
     chatsLoaded,
     friendsLoaded,
     messageEvent,
+    setCurrentChat,
   };
   return (
     <HomeContext.Provider value={contextValue}>
@@ -137,8 +139,8 @@ export function Home() {
         <div className="bg-[#282B30] min-w-96  w-screen  sm:w-96  min-h-screen">
           <SidePanel view={sideView} changeView={(v: View) => setSideView(v)} />
         </div>
-        <div className="bg-[#34373C] sm:w-full ">
-          <MainPanel conversationID={currentChat} />
+        <div className="bg-[#34373C] hidden sm:block sm:w-full ">
+          <MainPanel />
         </div>
       </div>
     </HomeContext.Provider>

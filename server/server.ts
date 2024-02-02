@@ -6,7 +6,8 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { Message, SocketClientDict, SocketClient } from './lib/types';
+import { Message, SocketClientDict } from './lib/types';
+//fix types
 
 import {
   ClientError,

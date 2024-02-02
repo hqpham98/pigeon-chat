@@ -26,6 +26,7 @@ export type Friend = {
   lastName: string;
 };
 
+export type Message = {};
 export type Conversation = {
   //add conversationName later
   conversationID: string;

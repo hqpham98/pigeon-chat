@@ -7,8 +7,7 @@ import {
 } from 'react-icons/fa6';
 import { View, Conversation, Friend } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
-import { useContext, useEffect } from 'react';
-import { PanelEntry } from './PanelEntry';
+import { useContext } from 'react';
 
 type SideProps = {
   view: View;
@@ -16,7 +15,6 @@ type SideProps = {
 };
 
 export function SidePanel({ view, changeView }: SideProps) {
-  const homeContext: HomeContextValues = useContext(HomeContext);
   return (
     // Container
     <div>
@@ -32,11 +30,7 @@ export function SidePanel({ view, changeView }: SideProps) {
       </div>
       {/* Panel Body */}
       <div className="py-2 px-4">
-        <PanelBody
-          view={view}
-          changeView={changeView}
-          homeContext={homeContext}
-        />
+        <PanelBody view={view} />
       </div>
     </div>
   );
@@ -97,34 +91,26 @@ function HeaderButtons({ view, changeView }: SideProps) {
   }
 }
 
-type PanelProps = {
+type BodyProps = {
   view: View;
-  changeView: (v: View) => void;
-  homeContext: HomeContextValues;
 };
 
-function PanelBody({ view, changeView, homeContext }: PanelProps) {
-  const {
-    currentChat,
-    chats,
-    friends,
-    currentChatLoaded,
-    chatsLoaded,
-    friendsLoaded,
-    messageEvent,
-    setCurrentChat,
-  } = homeContext;
+function PanelBody({ view }: BodyProps) {
+  const homeContext: HomeContextValues = useContext(HomeContext);
+  const { currentChat, chats, friends, setCurrentChat } = homeContext;
 
   if (view === 'Chats') {
     const result = chats.map((chat: Conversation) => (
       <div
         key={chat.conversationID}
-        onClick={(event) => {
+        onClick={() => {
           setCurrentChat(chat.conversationID);
         }}
         className={
-          'mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] rounded-md text-[#ADADAD] hover:bg-[#424549] hover:text-white cursor-pointer  ' +
-          (currentChat === chat.conversationID ? 'bg-[#424549]' : '')
+          'mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ' +
+          (currentChat === chat.conversationID
+            ? 'bg-[#424549] text-white'
+            : 'text-[#ADADAD]')
         }>
         {chat.conversationID}
       </div>
@@ -136,8 +122,8 @@ function PanelBody({ view, changeView, homeContext }: PanelProps) {
     const result = friends.map((f: Friend) => (
       <div
         key={f.userID}
-        className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] rounded-md text-[#ADADAD] hover:bg-[#424549] hover:text-white cursor-pointer">
-        {f.firstName + ' asdasdasd'}
+        className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ">
+        {f.firstName + 'asdasdasd'}
       </div>
     ));
     return <div className="px-2 py-1">{result}</div>;
