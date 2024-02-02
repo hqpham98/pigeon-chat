@@ -17,7 +17,7 @@ export function Home() {
   const [chatsLoaded, setChatsLoaded] = useState(false);
   const [friendsLoaded, setFriendsLoaded] = useState(false);
   const [messageEvent, setMessageEvent] = useState(false); //Toggle triggers useEffects
-  const [socket, setSocket] = useState<Socket>();
+  const [socket, setSocket] = useState<Socket>({} as Socket);
   const appContext = useContext(AppContext);
 
   //Initialize Socket on mount
@@ -26,7 +26,7 @@ export function Home() {
     setSocket(io('http://localhost:8080'));
     return () => {
       socket?.disconnect();
-      setSocket(undefined);
+      setSocket({} as Socket);
     };
   }, []);
 
