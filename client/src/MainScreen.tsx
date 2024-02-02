@@ -148,7 +148,7 @@ export function MainScreen() {
   return (
     <div>
       <h1 className="font-bold">Current Conversation</h1>
-      <span className="bg-yellow-400">{currentConvo || 'none'}</span>
+      <span className="">{currentConvo || 'none'}</span>
       <h1 className="font-bold">Conversations</h1>
       <ol>{convos}</ol>
       <h1 className="font-bold">Friends</h1>

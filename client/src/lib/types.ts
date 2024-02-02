@@ -15,7 +15,33 @@ export type MessagePayload = {
 
 export type SocketPayload = {
   userID: number;
-  id: number;
+  socketID: string;
 };
+
+export type Friend = {
+  //add display name later
+  userID: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+};
+
+export type Message = {
+  messageID: string;
+  messageContent: string;
+  userID: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  timestamp: string;
+};
+
+export type Conversation = {
+  //add conversationName later
+  conversationID: string;
+};
+export type ConversationList = Conversation[];
+
+export type ConversationID = string;
 
 export type View = 'Chats' | 'Friends' | 'Requests';
