@@ -14,7 +14,7 @@ export type HomeContextValues = {
   friendsLoaded: boolean;
   messageEvent: boolean;
   setCurrentChat: (x: ConversationID) => void;
-  socket: Socket;
+  socket: Socket | undefined;
 };
 
 export const HomeContext = createContext<HomeContextValues>({
@@ -29,5 +29,5 @@ export const HomeContext = createContext<HomeContextValues>({
   friendsLoaded: false,
   messageEvent: false,
   setCurrentChat: () => undefined,
-  socket: {} as Socket,
+  socket: undefined,
 });

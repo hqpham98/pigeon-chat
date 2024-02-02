@@ -17,16 +17,16 @@ export function Home() {
   const [chatsLoaded, setChatsLoaded] = useState(false);
   const [friendsLoaded, setFriendsLoaded] = useState(false);
   const [messageEvent, setMessageEvent] = useState(false); //Toggle triggers useEffects
-  const [socket, setSocket] = useState<Socket>({} as Socket);
+  const [socket, setSocket] = useState<Socket>();
   const appContext = useContext(AppContext);
 
   //Initialize Socket on mount
   useEffect(() => {
     console.log('socket initialized');
-    setSocket(io('http://localhost:8080'));
+    setSocket(io());
     return () => {
       socket?.disconnect();
-      setSocket({} as Socket);
+      setSocket(undefined);
     };
   }, []);
 
