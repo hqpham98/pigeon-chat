@@ -50,7 +50,7 @@ function InputArea() {
       conversationID: currentChat,
       messageContent: message,
     };
-    socket.emit('chat-message', payload);
+    socket?.emit('chat-message', payload);
     setMessage('');
   }
   return (
