@@ -122,8 +122,8 @@ function PanelBody({ view }: BodyProps) {
     const result = friends.map((f: Friend) => (
       <div
         key={f.userID}
-        className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ">
-        {f.firstName + 'asdasdasd'}
+        className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] text-[#ADADAD] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ">
+        {f.firstName} {f.lastName}
       </div>
     ));
     return <div className="px-2 py-1">{result}</div>;
