@@ -15,7 +15,7 @@ export type MessagePayload = {
 
 export type SocketPayload = {
   userID: number;
-  id: number;
+  socketID: string;
 };
 
 export type Friend = {

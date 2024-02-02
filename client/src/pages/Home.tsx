@@ -1,8 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 import { useState, useEffect, useContext } from 'react';
-import { View, ConversationID } from '../lib/types';
+import { View, ConversationID, SocketPayload } from '../lib/types';
 import { MainPanel } from '../components/MainPanel';
 import { SidePanel } from '../components/SidePanel';
+import { PanelEntry } from '../components/PanelEntry';
 import { AppContext } from '../components/AppContext';
 import { HomeContext, HomeContextValues } from '../components/HomeContext';
 
@@ -34,7 +35,12 @@ export function Home() {
     //Send userID to socket server
     if (!socket) return;
     socket.on('socket-init-request', () => {
-      const payload = { userID: appContext.user?.userID, socketID: socket.id };
+      //Correct appContext typing later on
+      if (!appContext.user || !socket.id) return;
+      const payload: SocketPayload = {
+        userID: appContext.user.userID,
+        socketID: socket.id,
+      };
       socket.emit('socket-init-response', payload);
     });
     //Toggle messageEvent to trigger chat reload useEffect if message is for the current chat
@@ -61,17 +67,9 @@ export function Home() {
         const res = await fetch(
           `/api/pigeon/conversations/${appContext.user?.userID}`
         );
-        const convos = await res.json();
-        const temp = convos.map((convo) => (
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() => setCurrentChat(convo.conversationID)}>
-            {convo.conversationID}
-          </button>
-        ));
-        setChats(temp);
+        const chats = await res.json();
+        setChats(chats);
         setChatsLoaded(true);
-        console.log('hi');
       } catch (err) {
         //Fix error reporting
         console.log(err);
@@ -128,6 +126,7 @@ export function Home() {
 
   const contextValue: HomeContextValues = {
     currentChat,
+    setCurrentChat,
     chats,
     friends,
     currentChatLoaded,
