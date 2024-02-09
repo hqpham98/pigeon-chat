@@ -7,7 +7,8 @@ import {
 } from 'react-icons/fa6';
 import { View, Conversation, Friend } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
-import { useContext } from 'react';
+import { AddFriendModal } from './AddFriendModal';
+import { useContext, useState } from 'react';
 
 type SideProps = {
   view: View;
@@ -15,9 +16,12 @@ type SideProps = {
 };
 
 export function SidePanel({ view, changeView }: SideProps) {
+  const [viewFriendModal, setViewFriendModal] = useState(false);
+
   return (
     // Container
     <div>
+      {viewFriendModal && <AddFriendModal viewModal={setViewFriendModal} />}
       {/* Header */}
       <div className="h-14 py-2 px-4 border-solid border-[#2E3034] border-b-2 flex">
         <h1 className="text-white font-bold text-2xl basis-[50%] self-center">
@@ -25,18 +29,29 @@ export function SidePanel({ view, changeView }: SideProps) {
         </h1>
         {/* Header Button Container */}
         <div className="flex basis-[50%] justify-end">
-          <HeaderButtons view={view} changeView={changeView} />
+          <HeaderButtons
+            view={view}
+            changeView={changeView}
+            modalView={setViewFriendModal}
+          />
         </div>
       </div>
       {/* Panel Body */}
       <div className="py-2 px-4 overflow-auto">
         <PanelBody view={view} />
       </div>
+      {/* Add Friend Modal */}
     </div>
   );
 }
 
-function HeaderButtons({ view, changeView }: SideProps) {
+type HeaderProps = {
+  view: View;
+  changeView: (v: View) => void;
+  modalView: (x: boolean) => void;
+};
+
+function HeaderButtons({ view, changeView, modalView }: HeaderProps) {
   if (view === 'Chats') {
     return (
       <>
@@ -69,6 +84,7 @@ function HeaderButtons({ view, changeView }: SideProps) {
         <FaUserPlus
           className="cursor-pointer ml-4 text-2xl self-center"
           style={{ color: '#FFFFFF' }}
+          onClick={() => modalView(true)}
         />
       </>
     );
