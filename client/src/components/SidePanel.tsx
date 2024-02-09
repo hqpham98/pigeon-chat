@@ -5,7 +5,7 @@ import {
   FaRegBell,
   FaUserPlus,
 } from 'react-icons/fa6';
-import { View, Conversation, Friend } from '../lib/types';
+import { View, Conversation, Friend, FriendRequest } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
 import { AddFriendModal } from './AddFriendModal';
 import { useContext, useState } from 'react';
@@ -113,7 +113,8 @@ type BodyProps = {
 
 function PanelBody({ view }: BodyProps) {
   const homeContext: HomeContextValues = useContext(HomeContext);
-  const { currentChat, chats, friends, setCurrentChat } = homeContext;
+  const { currentChat, chats, friends, friendRequests, setCurrentChat } =
+    homeContext;
 
   if (view === 'Chats') {
     const result = chats.map((chat: Conversation) => (
@@ -140,6 +141,17 @@ function PanelBody({ view }: BodyProps) {
         key={f.userID}
         className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] text-[#ADADAD] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ">
         {f.firstName} {f.lastName}
+      </div>
+    ));
+    return <div className="px-2 py-1">{result}</div>;
+  }
+
+  if (view === 'Requests') {
+    const result = friendRequests.map((request: FriendRequest) => (
+      <div
+        key={request.senderID}
+        className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] text-[#ADADAD] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ">
+        {request.firstName} {request.lastName}
       </div>
     ));
     return <div className="px-2 py-1">{result}</div>;

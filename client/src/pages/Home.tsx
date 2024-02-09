@@ -1,6 +1,11 @@
 import { io, Socket } from 'socket.io-client';
 import { useState, useEffect, useContext } from 'react';
-import { View, ConversationID, SocketPayload } from '../lib/types';
+import {
+  View,
+  ConversationID,
+  SocketPayload,
+  FriendRequest,
+} from '../lib/types';
 import { MainPanel } from '../components/MainPanel';
 import { SidePanel } from '../components/SidePanel';
 import { AppContext } from '../components/AppContext';
@@ -13,6 +18,7 @@ export function Home() {
   const [currentChat, setCurrentChat] = useState<ConversationID>('');
   const [chats, setChats] = useState([]); //create a conversationName in the db, not just id
   const [friends, setFriends] = useState([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [currentChatLoaded, setCurrentChatLoaded] = useState(false);
   const [chatsLoaded, setChatsLoaded] = useState(false);
   const [friendsLoaded, setFriendsLoaded] = useState(false);
@@ -82,7 +88,6 @@ export function Home() {
       }
     }
     getChats();
-    if (currentChat) getChats();
   }, []);
 
   //Load Friends List on mount
@@ -95,7 +100,6 @@ export function Home() {
         );
         //
         const friends = await res.json();
-        console.log('friends', friends);
         setFriends(friends);
         setFriendsLoaded(true);
       } catch (err) {
@@ -104,6 +108,21 @@ export function Home() {
       }
     }
     getFriends();
+  }, []);
+
+  //Load Friend Requests list on mount
+  useEffect(() => {
+    async function getRequests() {
+      console.log('getRequests ran');
+      try {
+        const res = await fetch(
+          `/api/pigeon/requests/${appContext.user?.userID}`
+        );
+        const requests: FriendRequest[] = await res.json();
+        setFriendRequests(requests);
+      } catch (err) {}
+    }
+    getRequests();
   }, []);
 
   //Reload chat everytime current conversation view is changed or messageEvent toggled.
@@ -133,6 +152,7 @@ export function Home() {
     currentMessages,
     chats,
     friends,
+    friendRequests,
     currentChatLoaded,
     chatsLoaded,
     friendsLoaded,

@@ -134,13 +134,13 @@ app.post('/api/pigeon/signup', async (req, res, next) => {
   }
 });
 
-// Get all requests for a userID
+// Get all friend requests for a userID
 app.get('/api/pigeon/requests/:userID', async (req, res, next) => {
   try {
     const { userID } = req.params;
-    const sql = `
-      SELECT "senderID"
+    const sql = `SELECT "requests"."senderID", "users"."username", "users"."firstName", "users"."lastName"
       FROM "requests"
+      JOIN "users" ON "requests"."senderID" = "users"."userID"
       WHERE "receiverID" = $1
       ORDER by "timestamp" ASC;`;
     const params = [userID];

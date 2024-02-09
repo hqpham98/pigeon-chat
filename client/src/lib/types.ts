@@ -45,3 +45,10 @@ export type ConversationList = Conversation[];
 export type ConversationID = string;
 
 export type View = 'Chats' | 'Friends' | 'Requests';
+
+export type FriendRequest = {
+  senderID: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+};
