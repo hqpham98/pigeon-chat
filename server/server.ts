@@ -97,9 +97,9 @@ app.post('/api/pigeon/login', async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const sql = `
-    SELECT "userID", "hashedPassword"
-    FROM "users"
-    WHERE "username"=$1;`;
+      SELECT "userID", "hashedPassword"
+      FROM "users"
+      WHERE "username"=$1;`;
     const params = [username];
     const result = await db.query(sql, params);
     const [user] = result.rows;
@@ -123,8 +123,8 @@ app.post('/api/pigeon/signup', async (req, res, next) => {
   try {
     const { firstName, lastName, email, username, password } = req.body;
     const sql = `
-    INSERT INTO "users" ("firstName", "lastName", "email", "username", "hashedPassword")
-    VALUES ($1, $2, $3, $4, $5);`;
+      INSERT INTO "users" ("firstName", "lastName", "email", "username", "hashedPassword")
+      VALUES ($1, $2, $3, $4, $5);`;
     const hashedPassword = await argon2.hash(password);
     const params = [firstName, lastName, email, username, hashedPassword];
     await db.query(sql, params);
@@ -134,6 +134,40 @@ app.post('/api/pigeon/signup', async (req, res, next) => {
   }
 });
 
+// Get all requests for a userID
+app.get('/api/pigeon/requests/:userID', async (req, res, next) => {
+  try {
+    const { userID } = req.params;
+    const sql = `
+      SELECT "senderID"
+      FROM "requests"
+      WHERE "receiverID" = $1
+      ORDER by "timestamp" ASC;`;
+    const params = [userID];
+    const result = await db.query(sql, params);
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Send a friend request to a userID from a userID
+app.post(
+  '/api/pigeon/requests/:senderID/:receiverID',
+  async (req, res, next) => {
+    try {
+      const { senderID, receiverID } = req.params;
+      const sql = `
+        INSERT INTO "requests" ("senderID", "receiverID")
+        VALUES ($1, $2);`;
+      const params = [senderID, receiverID];
+      await db.query(sql, params);
+      res.status(201).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 /*
  * Middleware that handles paths that aren't handled by static middleware
  * or API route handlers.
