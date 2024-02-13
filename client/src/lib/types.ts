@@ -18,7 +18,7 @@ export type SocketPayload = {
   socketID: string;
 };
 
-export type Friend = {
+export type Person = {
   //add display name later
   userID: number;
   username: string;

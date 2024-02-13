@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import {
   ConversationID,
   Conversation,
-  Friend,
+  Person,
   FriendRequest,
   Message,
 } from '../lib/types';
@@ -14,7 +14,7 @@ export type HomeContextValues = {
   currentChat: ConversationID;
   currentMessages: Message[];
   chats: Conversation[];
-  friends: Friend[];
+  friends: Person[];
   friendRequests: FriendRequest[];
   currentChatLoaded: boolean;
   chatsLoaded: boolean;

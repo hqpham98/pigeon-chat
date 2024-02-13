@@ -6,7 +6,7 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { Message, SocketClientDict } from './lib/types';
+import { Message, SocketClientDict, FriendRequest } from './lib/types';
 // fix types
 
 import {
@@ -88,6 +88,22 @@ app.get('/api/pigeon/friendships/:userID', async (req, res) => {
     JOIN "users" ON "friendships"."userID2" = "users"."userID"
     WHERE "friendships"."userID1" = $1;`;
   const params = [userID];
+  const result = await db.query(sql, params);
+  res.json(result.rows);
+});
+
+/**
+ * Get user info
+ * Given username, get Person (userID, username, firstName, lastName)
+ */
+
+app.get('/api/pigeon/users/:username', async (req, res) => {
+  const { username } = req.params;
+  const sql = `
+    SELECT "username", "userID", "firstName", "lastName"
+    FROM "users"
+    WHERE  "username" = $1`;
+  const params = [username];
   const result = await db.query(sql, params);
   res.json(result.rows);
 });
@@ -189,6 +205,13 @@ io.on('connection', (socket) => {
   });
   socket.on('disconnect', () => {
     console.log('user disconnected');
+  });
+
+  // Listen for friend request being sent
+  socket.on('friend-request-sent', (request: FriendRequest) => {
+    const { senderID, receiverID } = request;
+
+    //If receiving user is online, emit "friend-request-received" event to them
   });
 
   // Listen for new messages
