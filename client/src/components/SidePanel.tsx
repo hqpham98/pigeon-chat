@@ -4,6 +4,8 @@ import {
   FaRegMessage,
   FaRegBell,
   FaUserPlus,
+  FaCheck,
+  FaXmark,
 } from 'react-icons/fa6';
 import { View, Conversation, Friend, FriendRequest } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
@@ -148,10 +150,18 @@ function PanelBody({ view }: BodyProps) {
 
   if (view === 'Requests') {
     const result = friendRequests.map((request: FriendRequest) => (
-      <div
-        key={request.senderID}
-        className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] text-[#ADADAD] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ">
-        {request.firstName} {request.lastName}
+      <div className="flex justify-between mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] text-white rounded-md">
+        <div key={request.senderID}>
+          {request.firstName} {request.lastName}
+        </div>
+        <div className="flex">
+          <FaCheck
+            className="text-right cursor-pointer ml-4 text-2xl self-center"
+            style={{ color: '#FFFFFF' }}></FaCheck>
+          <FaXmark
+            className="text-right cursor-pointer ml-4 text-2xl self-center"
+            style={{ color: '#FFFFFF' }}></FaXmark>
+        </div>
       </div>
     ));
     return <div className="px-2 py-1">{result}</div>;
