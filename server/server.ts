@@ -194,7 +194,9 @@ app.use(defaultMiddleware(reactStaticDir));
 
 app.use(errorMiddleware);
 
-// Create socket server listener
+/**
+ * Socket Server Event Handlers
+ */
 io.on('connection', (socket) => {
   console.log('user connected');
   io.to(socket.id).emit('socket-init-request', 'hello');
@@ -208,10 +210,18 @@ io.on('connection', (socket) => {
   });
 
   // Listen for friend request being sent
-  socket.on('friend-request-sent', (request: FriendRequest) => {
+  socket.on('friend-request-sent', async (request: FriendRequest) => {
     const { senderID, receiverID } = request;
-
+    const sql = `
+      INSERT INTO "requests" ("senderID", "receiverID")
+      VALUES ($1, $2);`;
+    const params = [senderID, receiverID];
+    await db.query(sql, params);
     //If receiving user is online, emit "friend-request-received" event to them
+    const socketID = socketClientDict['' + receiverID];
+    if (socketID !== undefined) {
+      io.to('' + socketID).emit('friend-request-received');
+    }
   });
 
   // Listen for new messages
@@ -239,7 +249,9 @@ io.on('connection', (socket) => {
     const result = await db.query(sql, params);
     for (let i = 0; i < result.rows.length; i++) {
       const socketID = socketClientDict['' + result.rows[i].userID];
-      io.to('' + socketID).emit('message-received', conversationID);
+      if (socketID !== undefined) {
+        io.to('' + socketID).emit('message-received', conversationID);
+      }
     }
   });
 });

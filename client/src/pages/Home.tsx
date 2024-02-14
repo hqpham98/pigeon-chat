@@ -22,6 +22,7 @@ export function Home() {
   const [currentChatLoaded, setCurrentChatLoaded] = useState(false);
   const [chatsLoaded, setChatsLoaded] = useState(false);
   const [friendsLoaded, setFriendsLoaded] = useState(false);
+  const [requestReceived, setRequestReceived] = useState(false); //Toggle triggers useEffects
   const [messageEvent, setMessageEvent] = useState(false); //Toggle triggers useEffects
   const [socket, setSocket] = useState<Socket>();
   const appContext = useContext(AppContext);
@@ -47,7 +48,6 @@ export function Home() {
     //Send userID to socket server
     if (!socket) return;
     socket.on('socket-init-request', () => {
-      //Correct appContext typing later on
       if (!appContext.user || !socket.id) return;
       const payload: SocketPayload = {
         userID: appContext.user.userID,
@@ -60,6 +60,9 @@ export function Home() {
       if (currentChat === convo) {
         setMessageEvent((prev) => !prev);
       }
+    });
+    socket.on('friend-request-received', () => {
+      setRequestReceived((prev) => !prev);
     });
     //Log all socket events listened
     socket.onAny((event) => {
@@ -110,7 +113,7 @@ export function Home() {
     getFriends();
   }, []);
 
-  //Load Friend Requests list on mount
+  //Load Friend Requests list on mount or requestReceived toggled
   useEffect(() => {
     async function getRequests() {
       console.log('getRequests ran');
@@ -123,7 +126,7 @@ export function Home() {
       } catch (err) {}
     }
     getRequests();
-  }, []);
+  }, [requestReceived]);
 
   //Reload chat everytime current conversation view is changed or messageEvent toggled.
   useEffect(() => {

@@ -34,6 +34,9 @@ export function AddFriendModal({ viewModal }: FriendModalProps) {
             setModalMessage(`User doesn't exist.`);
           } else {
             // User does exist
+            //TODO:  If already friends, display error message
+            //TODO:  If request already exists, display error message
+
             // Send friend request to Socket server
             const payload = {
               senderID: appContext.user?.userID,
@@ -46,10 +49,6 @@ export function AddFriendModal({ viewModal }: FriendModalProps) {
       } catch (err) {
         console.log(err);
       }
-      //With username, get userID, username,
-      //If already friends, display error message, return false
-      //If request already exists, display error message, return false
-      //Else send request and return true
     }
     sendRequest(friendName);
   }, [enterPressed]);
