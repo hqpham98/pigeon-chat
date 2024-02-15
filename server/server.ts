@@ -6,7 +6,12 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { Message, SocketClientDict, FriendRequest } from './lib/types';
+import {
+  Message,
+  SocketClientDict,
+  FriendRequest,
+  RequestDecision,
+} from './lib/types';
 // fix types
 
 import {
@@ -199,8 +204,12 @@ app.use(errorMiddleware);
  */
 io.on('connection', (socket) => {
   console.log('user connected');
+  /**
+   * Add sockets to online client list socketClientDict
+   *
+   * Request for socket to provide userID to add to the client list.
+   */
   io.to(socket.id).emit('socket-init-request', 'hello');
-  // Add socket to client list
   socket.on('socket-init-response', (client) => {
     socketClientDict['' + client.userID] = client.socketID;
     console.log(`hello ${client.userID}`);
@@ -208,8 +217,11 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
-
-  // Listen for friend request being sent
+  /**
+   * Friend Request is Sent
+   *
+   * Emit friend-request-received if receiver is online
+   */
   socket.on('friend-request-sent', async (request: FriendRequest) => {
     const { senderID, receiverID } = request;
     const sql = `
@@ -217,19 +229,55 @@ io.on('connection', (socket) => {
       VALUES ($1, $2);`;
     const params = [senderID, receiverID];
     await db.query(sql, params);
-    // If receiving user is online, emit "friend-request-received" event to them
-    const socketID = socketClientDict['' + receiverID];
-    if (socketID !== undefined) {
-      io.to('' + socketID).emit('friend-request-received');
+    const client = socketClientDict['' + receiverID];
+    if (client !== undefined) {
+      io.to('' + client).emit('friend-request-received');
     }
   });
 
-  // Listen for Friend Request decision
-  socket.on('friend-request-decision', (decision: string) => {
-    console.log('friend request decision:', decision);
+  /**
+   * Friend Request Decision
+   *
+   * Update friendship table if friend request accepted
+   * Query sender and receiver to update friend list if accepted
+   *
+   * Emit friend-request-update event to client to reload their request list
+   * Delete request from DB upon decision
+   */
+  socket.on('friend-request-decision', async (request: RequestDecision) => {
+    const { decision, senderID, receiverID } = request;
+    const client1 = socketClientDict['' + receiverID];
+    const client2 = socketClientDict['' + senderID];
+    if (decision === 'accept') {
+      const sql = `
+        INSERT INTO "friendships" ("userID1", "userID2")
+        VALUES ($1, $2), ($2, $1);`;
+      const params = [senderID, receiverID];
+      await db.query(sql, params);
+
+      if (client1 !== undefined) {
+        io.to('' + client1).emit('friend-list-update');
+      }
+      if (client2 !== undefined) {
+        io.to('' + client2).emit('friend-list-update');
+      }
+    }
+    const sql = `
+        DELETE FROM "requests"
+        WHERE  "senderID" = $1 AND "receiverID" = $2`;
+    const params = [senderID, receiverID];
+    await db.query(sql, params);
+    if (client1 !== undefined) {
+      io.to('' + client1).emit('friend-request-update');
+    }
   });
-  // Listen for new messages
-  // Update DB
+
+  /**
+   * Chat Message is sent
+   *
+   * If client is online, emit message-received event
+   */
+
   socket.on('chat-message', async (msg: Message) => {
     const { conversationID, userID, username, messageContent } = msg;
     // Notify the server that message body is received
@@ -252,9 +300,9 @@ io.on('connection', (socket) => {
     params = [conversationID];
     const result = await db.query(sql, params);
     for (let i = 0; i < result.rows.length; i++) {
-      const socketID = socketClientDict['' + result.rows[i].userID];
-      if (socketID !== undefined) {
-        io.to('' + socketID).emit('message-received', conversationID);
+      const client = socketClientDict['' + result.rows[i].userID];
+      if (client !== undefined) {
+        io.to('' + client).emit('message-received', conversationID);
       }
     }
   });

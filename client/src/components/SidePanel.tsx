@@ -11,6 +11,7 @@ import { View, Conversation, Person, FriendRequest } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
 import { AddFriendModal } from './AddFriendModal';
 import { useContext, useState } from 'react';
+import { AppContext, AppContextValues } from './AppContext';
 
 type SideProps = {
   view: View;
@@ -114,6 +115,8 @@ type BodyProps = {
 };
 
 function PanelBody({ view }: BodyProps) {
+  const appContext: AppContextValues = useContext(AppContext);
+  const userID = appContext.user?.userID;
   const homeContext: HomeContextValues = useContext(HomeContext);
   const {
     currentChat,
@@ -165,13 +168,21 @@ function PanelBody({ view }: BodyProps) {
             className="text-right cursor-pointer ml-4 text-2xl self-center"
             style={{ color: '#FFFFFF' }}
             onClick={() =>
-              socket?.emit('friend-request-decision', 'accept')
+              socket?.emit('friend-request-decision', {
+                decision: 'accept',
+                senderID: request.senderID,
+                receiverID: userID,
+              })
             }></FaCheck>
           <FaXmark
             className="text-right cursor-pointer ml-4 text-2xl self-center"
             style={{ color: '#FFFFFF' }}
             onClick={() =>
-              socket?.emit('friend-request-decision', 'reject')
+              socket?.emit('friend-request-decision', {
+                decision: 'reject',
+                senderID: request.senderID,
+                receiverID: userID,
+              })
             }></FaXmark>
         </div>
       </div>
