@@ -217,13 +217,17 @@ io.on('connection', (socket) => {
       VALUES ($1, $2);`;
     const params = [senderID, receiverID];
     await db.query(sql, params);
-    //If receiving user is online, emit "friend-request-received" event to them
+    // If receiving user is online, emit "friend-request-received" event to them
     const socketID = socketClientDict['' + receiverID];
     if (socketID !== undefined) {
       io.to('' + socketID).emit('friend-request-received');
     }
   });
 
+  // Listen for Friend Request decision
+  socket.on('friend-request-decision', (decision: string) => {
+    console.log('friend request decision:', decision);
+  });
   // Listen for new messages
   // Update DB
   socket.on('chat-message', async (msg: Message) => {

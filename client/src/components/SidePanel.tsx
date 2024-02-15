@@ -7,7 +7,7 @@ import {
   FaCheck,
   FaXmark,
 } from 'react-icons/fa6';
-import { View, Conversation, Friend, FriendRequest } from '../lib/types';
+import { View, Conversation, Person, FriendRequest } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
 import { AddFriendModal } from './AddFriendModal';
 import { useContext, useState } from 'react';
@@ -115,8 +115,14 @@ type BodyProps = {
 
 function PanelBody({ view }: BodyProps) {
   const homeContext: HomeContextValues = useContext(HomeContext);
-  const { currentChat, chats, friends, friendRequests, setCurrentChat } =
-    homeContext;
+  const {
+    currentChat,
+    chats,
+    friends,
+    friendRequests,
+    setCurrentChat,
+    socket,
+  } = homeContext;
 
   if (view === 'Chats') {
     const result = chats.map((chat: Conversation) => (
@@ -138,11 +144,11 @@ function PanelBody({ view }: BodyProps) {
     return <div className="px-2 py-1">{result}</div>;
   }
   if (view === 'Friends') {
-    const result = friends.map((f: Friend) => (
+    const result = friends.map((p: Person) => (
       <div
-        key={f.userID}
+        key={p.userID}
         className="mx-auto basis-[100%] my-2 p-2 w-full font-medium text-[20px] text-[#ADADAD] rounded-md hover:bg-[#424549] hover:text-white cursor-pointer  ">
-        {f.firstName} {f.lastName}
+        {p.firstName} {p.lastName}
       </div>
     ));
     return <div className="px-2 py-1">{result}</div>;
@@ -157,10 +163,16 @@ function PanelBody({ view }: BodyProps) {
         <div className="flex">
           <FaCheck
             className="text-right cursor-pointer ml-4 text-2xl self-center"
-            style={{ color: '#FFFFFF' }}></FaCheck>
+            style={{ color: '#FFFFFF' }}
+            onClick={() =>
+              socket?.emit('friend-request-decision', 'accept')
+            }></FaCheck>
           <FaXmark
             className="text-right cursor-pointer ml-4 text-2xl self-center"
-            style={{ color: '#FFFFFF' }}></FaXmark>
+            style={{ color: '#FFFFFF' }}
+            onClick={() =>
+              socket?.emit('friend-request-decision', 'reject')
+            }></FaXmark>
         </div>
       </div>
     ));
