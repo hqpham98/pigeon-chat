@@ -6,8 +6,12 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { Message, SocketClientDict } from './lib/types';
-// fix types
+import {
+  Message,
+  SocketClientDict,
+  FriendRequest,
+  RequestDecision,
+} from './lib/types';
 
 import {
   ClientError,
@@ -92,14 +96,30 @@ app.get('/api/pigeon/friendships/:userID', async (req, res) => {
   res.json(result.rows);
 });
 
+/**
+ * Get user info
+ * Given username, get Person (userID, username, firstName, lastName)
+ */
+
+app.get('/api/pigeon/users/:username', async (req, res) => {
+  const { username } = req.params;
+  const sql = `
+    SELECT "username", "userID", "firstName", "lastName"
+    FROM "users"
+    WHERE  "username" = $1`;
+  const params = [username];
+  const result = await db.query(sql, params);
+  res.json(result.rows);
+});
+
 // Login
 app.post('/api/pigeon/login', async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const sql = `
-    SELECT "userID", "hashedPassword"
-    FROM "users"
-    WHERE "username"=$1;`;
+      SELECT "userID", "hashedPassword"
+      FROM "users"
+      WHERE "username"=$1;`;
     const params = [username];
     const result = await db.query(sql, params);
     const [user] = result.rows;
@@ -123,8 +143,8 @@ app.post('/api/pigeon/signup', async (req, res, next) => {
   try {
     const { firstName, lastName, email, username, password } = req.body;
     const sql = `
-    INSERT INTO "users" ("firstName", "lastName", "email", "username", "hashedPassword")
-    VALUES ($1, $2, $3, $4, $5);`;
+      INSERT INTO "users" ("firstName", "lastName", "email", "username", "hashedPassword")
+      VALUES ($1, $2, $3, $4, $5);`;
     const hashedPassword = await argon2.hash(password);
     const params = [firstName, lastName, email, username, hashedPassword];
     await db.query(sql, params);
@@ -134,6 +154,40 @@ app.post('/api/pigeon/signup', async (req, res, next) => {
   }
 });
 
+// Get all friend requests for a userID
+app.get('/api/pigeon/requests/:userID', async (req, res, next) => {
+  try {
+    const { userID } = req.params;
+    const sql = `SELECT "requests"."senderID", "users"."username", "users"."firstName", "users"."lastName"
+      FROM "requests"
+      JOIN "users" ON "requests"."senderID" = "users"."userID"
+      WHERE "receiverID" = $1
+      ORDER by "timestamp" ASC;`;
+    const params = [userID];
+    const result = await db.query(sql, params);
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Send a friend request to a userID from a userID
+app.post(
+  '/api/pigeon/requests/:senderID/:receiverID',
+  async (req, res, next) => {
+    try {
+      const { senderID, receiverID } = req.params;
+      const sql = `
+        INSERT INTO "requests" ("senderID", "receiverID")
+        VALUES ($1, $2);`;
+      const params = [senderID, receiverID];
+      await db.query(sql, params);
+      res.status(201).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 /*
  * Middleware that handles paths that aren't handled by static middleware
  * or API route handlers.
@@ -144,11 +198,17 @@ app.use(defaultMiddleware(reactStaticDir));
 
 app.use(errorMiddleware);
 
-// Create socket server listener
+/**
+ * Socket Server Event Handlers
+ */
 io.on('connection', (socket) => {
   console.log('user connected');
+  /**
+   * Add sockets to online client list socketClientDict
+   *
+   * Request for socket to provide userID to add to the client list.
+   */
   io.to(socket.id).emit('socket-init-request', 'hello');
-  // Add socket to client list
   socket.on('socket-init-response', (client) => {
     socketClientDict['' + client.userID] = client.socketID;
     console.log(`hello ${client.userID}`);
@@ -156,9 +216,67 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
+  /**
+   * Friend Request is Sent
+   *
+   * Emit friend-request-received if receiver is online
+   */
+  socket.on('friend-request-sent', async (request: FriendRequest) => {
+    const { senderID, receiverID } = request;
+    const sql = `
+      INSERT INTO "requests" ("senderID", "receiverID")
+      VALUES ($1, $2);`;
+    const params = [senderID, receiverID];
+    await db.query(sql, params);
+    const client = socketClientDict['' + receiverID];
+    if (client !== undefined) {
+      io.to('' + client).emit('friend-request-received');
+    }
+  });
 
-  // Listen for new messages
-  // Update DB
+  /**
+   * Friend Request Decision
+   *
+   * Update friendship table if friend request accepted
+   * Query sender and receiver to update friend list if accepted
+   *
+   * Emit friend-request-update event to client to reload their request list
+   * Delete request from DB upon decision
+   */
+  socket.on('friend-request-decision', async (request: RequestDecision) => {
+    const { decision, senderID, receiverID } = request;
+    const client1 = socketClientDict['' + receiverID];
+    const client2 = socketClientDict['' + senderID];
+    if (decision === 'accept') {
+      const sql = `
+        INSERT INTO "friendships" ("userID1", "userID2")
+        VALUES ($1, $2), ($2, $1);`;
+      const params = [senderID, receiverID];
+      await db.query(sql, params);
+
+      if (client1 !== undefined) {
+        io.to('' + client1).emit('friend-list-update');
+      }
+      if (client2 !== undefined) {
+        io.to('' + client2).emit('friend-list-update');
+      }
+    }
+    const sql = `
+        DELETE FROM "requests"
+        WHERE  "senderID" = $1 AND "receiverID" = $2`;
+    const params = [senderID, receiverID];
+    await db.query(sql, params);
+    if (client1 !== undefined) {
+      io.to('' + client1).emit('friend-request-update');
+    }
+  });
+
+  /**
+   * Chat Message is sent
+   *
+   * If client is online, emit message-received event
+   */
+
   socket.on('chat-message', async (msg: Message) => {
     const { conversationID, userID, username, messageContent } = msg;
     // Notify the server that message body is received
@@ -181,8 +299,10 @@ io.on('connection', (socket) => {
     params = [conversationID];
     const result = await db.query(sql, params);
     for (let i = 0; i < result.rows.length; i++) {
-      const socketID = socketClientDict['' + result.rows[i].userID];
-      io.to('' + socketID).emit('message-received', conversationID);
+      const client = socketClientDict['' + result.rows[i].userID];
+      if (client !== undefined) {
+        io.to('' + client).emit('message-received', conversationID);
+      }
     }
   });
 });

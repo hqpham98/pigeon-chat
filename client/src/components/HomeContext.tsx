@@ -1,5 +1,11 @@
 import { createContext } from 'react';
-import { ConversationID, Conversation, Friend, Message } from '../lib/types';
+import {
+  ConversationID,
+  Conversation,
+  Person,
+  FriendRequest,
+  Message,
+} from '../lib/types';
 import { Socket } from 'socket.io-client';
 
 export type HomeContextValues = {
@@ -8,7 +14,8 @@ export type HomeContextValues = {
   currentChat: ConversationID;
   currentMessages: Message[];
   chats: Conversation[];
-  friends: Friend[];
+  friends: Person[];
+  friendRequests: FriendRequest[];
   currentChatLoaded: boolean;
   chatsLoaded: boolean;
   friendsLoaded: boolean;
@@ -24,6 +31,7 @@ export const HomeContext = createContext<HomeContextValues>({
   currentMessages: [],
   chats: [],
   friends: [],
+  friendRequests: [],
   currentChatLoaded: false,
   chatsLoaded: false,
   friendsLoaded: false,

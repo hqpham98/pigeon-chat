@@ -6,3 +6,13 @@ export type Message = {
 };
 
 export type SocketClientDict = Record<string, number>;
+export type FriendRequest = {
+  senderID: number;
+  receiverID: number;
+};
+
+export type RequestDecision = {
+  decision: 'accept' | 'reject';
+  senderID: number;
+  receiverID: number;
+};
