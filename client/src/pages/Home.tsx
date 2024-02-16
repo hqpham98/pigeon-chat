@@ -81,7 +81,7 @@ export function Home() {
     });
     /**
      * friend-list-update
-     *
+     * Toggle setFriendEvent state to trigger useEffect for friend list reload
      */
     socket.on('friend-list-update', () => {
       setFriendEvent((prev) => !prev);
