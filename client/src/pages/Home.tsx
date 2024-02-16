@@ -24,10 +24,13 @@ export function Home() {
   const [friendsLoaded, setFriendsLoaded] = useState(false);
   const [requestReceived, setRequestReceived] = useState(false); //Toggle triggers useEffects
   const [messageEvent, setMessageEvent] = useState(false); //Toggle triggers useEffects
+  const [friendEvent, setFriendEvent] = useState(false); //Toggle triggers useEffects
   const [socket, setSocket] = useState<Socket>();
   const appContext = useContext(AppContext);
 
-  //Initialize Socket on mount
+  /**
+   * Initialize Socket on mount
+   */
   useEffect(() => {
     console.log('socket initialized');
     if (process.env.NODE_ENV === 'production') {
@@ -42,10 +45,15 @@ export function Home() {
     };
   }, []);
 
-  //Add event listeners to socket
+  /**
+   * Define Socket Event Handlers
+   */
   useEffect(() => {
     console.log('added  event listeners to socket');
-    //Send userID to socket server
+    /**
+     * socket-init-request
+     * Send userID to Socket server
+     */
     if (!socket) return;
     socket.on('socket-init-request', () => {
       if (!appContext.user || !socket.id) return;
@@ -55,16 +63,39 @@ export function Home() {
       };
       socket.emit('socket-init-response', payload);
     });
-    //Toggle messageEvent to trigger chat reload useEffect if message is for the current chat
+    /**
+     * message-received
+     * Toggle messageEvent state to trigger useEffect for chat reload if the message is for the current convo
+     */
     socket.on('message-received', (convo: ConversationID) => {
       if (currentChat === convo) {
         setMessageEvent((prev) => !prev);
       }
     });
+    /**
+     * friend-request-received
+     * Toggle setRequestReceived state to trigger useEffect for friend request list reload
+     */
     socket.on('friend-request-received', () => {
       setRequestReceived((prev) => !prev);
     });
-    //Log all socket events listened
+    /**
+     * friend-list-update
+     *
+     */
+    socket.on('friend-list-update', () => {
+      setFriendEvent((prev) => !prev);
+    });
+    /**
+     * friend-request-update
+     * Toggle setRequestReceived state to trigger useEffect for friend request list reload
+     */
+    socket.on('friend-request-update', () => {
+      setRequestReceived((prev) => !prev);
+    });
+    /**
+     * Log all Socket events listened
+     */
     socket.onAny((event) => {
       console.log('listened to event: ', event);
     });
@@ -73,12 +104,13 @@ export function Home() {
     };
   }, [socket, currentChat]);
 
-  //Load Conversations on mount
+  /**
+   * Load conversations on mount
+   */
   useEffect(() => {
     async function getChats() {
       console.log('getChats ran');
       try {
-        //Fix appContext type definitions later
         const res = await fetch(
           `/api/pigeon/conversations/${appContext.user?.userID}`
         );
@@ -86,14 +118,15 @@ export function Home() {
         setChats(chats);
         setChatsLoaded(true);
       } catch (err) {
-        //Fix error reporting
         console.log(err);
       }
     }
     getChats();
   }, []);
 
-  //Load Friends List on mount
+  /**
+   * Load Friends List on mount or friendEvent toggled
+   */
   useEffect(() => {
     async function getFriends() {
       console.log('getFriends ran');
@@ -101,19 +134,19 @@ export function Home() {
         const res = await fetch(
           `/api/pigeon/friendships/${appContext.user?.userID}`
         );
-        //
         const friends = await res.json();
         setFriends(friends);
         setFriendsLoaded(true);
       } catch (err) {
-        //Fix error reporting
         console.log(err);
       }
     }
     getFriends();
-  }, []);
+  }, [friendEvent]);
 
-  //Load Friend Requests list on mount or requestReceived toggled
+  /**
+   * Load Friend Requests list on mount or requestReceived toggled
+   */
   useEffect(() => {
     async function getRequests() {
       console.log('getRequests ran');
@@ -123,12 +156,16 @@ export function Home() {
         );
         const requests: FriendRequest[] = await res.json();
         setFriendRequests(requests);
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     }
     getRequests();
   }, [requestReceived]);
 
-  //Reload chat everytime current conversation view is changed or messageEvent toggled.
+  /**
+   * Reload chat everytime current conversation view is changed or messageEvent state is changed
+   */
   useEffect(() => {
     //Load chat from current convo
     async function getCurrentChat() {

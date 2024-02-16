@@ -12,7 +12,6 @@ import {
   FriendRequest,
   RequestDecision,
 } from './lib/types';
-// fix types
 
 import {
   ClientError,
