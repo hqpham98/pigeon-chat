@@ -106,6 +106,8 @@ export function Home() {
 
   /**
    * Load conversations on mount
+   *
+   * TODO: And load on conversation event
    */
   useEffect(() => {
     async function getChats() {

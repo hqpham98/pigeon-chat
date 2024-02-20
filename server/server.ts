@@ -6,11 +6,13 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Message,
   SocketClientDict,
   FriendRequest,
   RequestDecision,
+  PrivateMessageRequest,
 } from './lib/types';
 
 import {
@@ -270,6 +272,30 @@ io.on('connection', (socket) => {
       io.to('' + client1).emit('friend-request-update');
     }
   });
+
+  /**
+   * New Private Message is Requested
+   *
+   * Create new conversation
+   * If client is online, emit conversation-created event with the conversationID
+   */
+
+  socket.on(
+    'private-message-request',
+    async (request: PrivateMessageRequest) => {
+      const { userID1, userID2 } = request;
+      const convoID = uuidv4();
+      const sql = `
+        INSERT INTO "conversations" ("conversationID", "userID")
+        VALUES ($1, $2), ($1, $3)`;
+      const params = [convoID, userID1, userID2];
+      await db.query(sql, params);
+      const client = socketClientDict['' + userID1];
+      if (client !== undefined) {
+        io.to('' + client).emit('conversation-created', convoID);
+      }
+    }
+  );
 
   /**
    * Chat Message is sent

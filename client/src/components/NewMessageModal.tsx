@@ -2,6 +2,7 @@ import { HomeContext, HomeContextValues } from './HomeContext';
 import { AppContext, AppContextValues } from './AppContext';
 import { useContext, useEffect, useState } from 'react';
 import { Person } from '../lib/types';
+import App from '../App';
 
 type MessageModalProps = {
   viewModal: (x: boolean) => void;
@@ -43,11 +44,13 @@ export function NewMessageModal({ viewModal }: MessageModalProps) {
           <input
             className="block bg-[#424549] placeholder:text-[#ADADAD] text-white p-2 w-full rounded focus:outline-none"
             type="text"
-            placeholder="Type in a friend's ID"
+            placeholder="Type in a friend's name or ID"
             onChange={(e) => {
               setSearchQuery(e.currentTarget.value);
             }}></input>
-          {searchQuery && <SearchResults results={results} />}
+          {searchQuery && (
+            <SearchResults results={results} viewModal={viewModal} />
+          )}
         </div>
       </div>
     </div>
@@ -56,18 +59,33 @@ export function NewMessageModal({ viewModal }: MessageModalProps) {
 
 type ResultsProps = {
   results: Person[];
+  viewModal: (x: boolean) => void;
 };
-function SearchResults({ results }: ResultsProps) {
+function SearchResults({ results, viewModal }: ResultsProps) {
+  const homeContext: HomeContextValues = useContext(HomeContext);
+  const appContext: AppContextValues = useContext(AppContext);
+  const { socket } = homeContext;
+  const { user } = appContext;
+
   if (results.length === 0) {
     return <h1 className="text-red-500">No results found</h1>;
   }
+
   const result = results.map((p: Person) => (
-    <div className="flex justify-between" key={p.userID}>
+    <div
+      className="flex justify-between pt-2 text-[#ADADAD] hover:text-white cursor-pointer"
+      onClick={() =>
+        socket?.emit('private-message-request', {
+          userID1: user?.userID,
+          userID2: p.userID,
+        })
+      }
+      key={p.userID}>
       <div>
         {p.firstName} {p.lastName}
       </div>
       <div>{`@${p.username}`}</div>
     </div>
   ));
-  return <h1 className="text-white">{result}</h1>;
+  return <>{result}</>;
 }
