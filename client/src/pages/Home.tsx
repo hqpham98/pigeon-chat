@@ -36,7 +36,6 @@ export function Home() {
    * Initialize Socket on mount
    */
   useEffect(() => {
-    console.log('socket initialized');
     if (process.env.NODE_ENV === 'production') {
       setSocket(io());
     } else {
@@ -53,7 +52,6 @@ export function Home() {
    * Define Socket Event Handlers
    */
   useEffect(() => {
-    console.log('added  event listeners to socket');
     /**
      * socket-init-request
      * Send userID to Socket server
@@ -116,12 +114,6 @@ export function Home() {
       setConvoEvent((prev) => !prev);
     });
 
-    /**
-     * Log all Socket events listened
-     */
-    socket.onAny((event) => {
-      console.log('listened to event: ', event);
-    });
     return () => {
       socket.off();
     };
@@ -132,7 +124,6 @@ export function Home() {
    */
   useEffect(() => {
     async function getChats() {
-      console.log('getChats ran');
       try {
         const res = await fetch(
           `/api/pigeon/conversations/conversationids/${appContext.user?.userID}`
@@ -163,7 +154,6 @@ export function Home() {
    */
   useEffect(() => {
     async function getFriends() {
-      console.log('getFriends ran');
       try {
         const res = await fetch(
           `/api/pigeon/friendships/${appContext.user?.userID}`
@@ -183,7 +173,6 @@ export function Home() {
    */
   useEffect(() => {
     async function getRequests() {
-      console.log('getRequests ran');
       try {
         const res = await fetch(
           `/api/pigeon/requests/${appContext.user?.userID}`
@@ -203,7 +192,6 @@ export function Home() {
   useEffect(() => {
     //Load chat from current convo
     async function getCurrentChat() {
-      console.log('getCurrentChat ran');
       try {
         const res = await fetch(`/api/pigeon/messages/${currentChat}`);
         const messages = await res.json();
