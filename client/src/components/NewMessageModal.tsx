@@ -2,7 +2,6 @@ import { HomeContext, HomeContextValues } from './HomeContext';
 import { AppContext, AppContextValues } from './AppContext';
 import { useContext, useEffect, useState } from 'react';
 import { Person } from '../lib/types';
-import App from '../App';
 
 type MessageModalProps = {
   viewModal: (x: boolean) => void;
@@ -11,7 +10,6 @@ type MessageModalProps = {
 export function NewMessageModal({ viewModal }: MessageModalProps) {
   const homeContext: HomeContextValues = useContext(HomeContext);
   const { friends } = homeContext;
-  const appContext = useContext(AppContext);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<Person[]>([]);
