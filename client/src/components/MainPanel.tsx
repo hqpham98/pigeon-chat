@@ -9,21 +9,21 @@ export function MainPanel() {
   const [chatName, setChatName] = useState('');
   const { currentChat, chats } = homeContext;
 
-  const current = chats.filter((chat: Conversation) => {
-    return currentChat === chat.conversationID;
-  })[0];
-
   useEffect(() => {
+    const current = chats.filter((chat: Conversation) => {
+      return currentChat === chat.conversationID;
+    })[0];
+
     if (current) {
-      let user1 = current.participants[0];
-      let user2 = current.participants[1];
+      const user1 = current.participants[0];
+      const user2 = current.participants[1];
       if (user1.userID === appContext.user?.userID) {
         setChatName(`${user2.firstName} ${user2.lastName}`);
       } else {
         setChatName(`${user1.firstName} ${user1.lastName}`);
       }
     }
-  }, [currentChat]);
+  }, [currentChat, chats]);
 
   return (
     //Container

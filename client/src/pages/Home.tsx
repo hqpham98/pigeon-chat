@@ -103,8 +103,8 @@ export function Home() {
      * Toggle setConvoEvent state to trigger useEffect for conversation list reload
      */
     socket.on('conversation-created', (convo: ConversationID) => {
-      setConvoEvent((prev) => !prev);
       setCurrentChat(convo);
+      setConvoEvent((prev) => !prev);
     });
 
     /**
