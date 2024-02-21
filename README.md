@@ -4,6 +4,13 @@ A full stack web app for instant messaging using TypeScript, React.JS, Express.J
 
 Live Deployment: https://www.pigeonchat.xyz/
 
+## Guest Accounts for Testing
+**user:** username
+**pass:** password
+
+**user:** henry
+**pass:** pham
+
 ## Demo 
 ![Kapture 2024-02-21 at 12 19 42](https://github.com/hqpham98/pigeon-chat/assets/7689363/9d399813-c836-4161-8bdb-15ad365d7617)
 
