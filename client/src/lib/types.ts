@@ -39,11 +39,18 @@ export type Message = {
 export type Conversation = {
   //add conversationName later
   conversationID: string;
+  participants: Person[];
 };
-export type ConversationList = Conversation[];
 
 export type ConversationID = string;
 
+export type ConversationIDObject = {
+  conversationID: string;
+};
+
+export type UserIDObject = {
+  userID: number;
+};
 export type View = 'Chats' | 'Friends' | 'Requests';
 
 export type FriendRequest = {

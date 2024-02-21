@@ -58,17 +58,45 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-// Get all conversations involving userID
-app.get('/api/pigeon/conversations/:userID', async (req, res) => {
-  const { userID } = req.params;
-  const sql = `
+/**
+ * GET all conversations involving userID
+ *
+ * [{conversationID}]
+ */
+app.get(
+  '/api/pigeon/conversations/conversationids/:userID',
+  async (req, res) => {
+    const { userID } = req.params;
+    const sql = `
     SELECT "conversationID"
     FROM "conversations"
     WHERE "userID" = $1;`;
-  const params = [userID];
-  const result = await db.query(sql, params);
-  res.json(result.rows);
-});
+    const params = [userID];
+    const result = await db.query(sql, params);
+    res.json(result.rows);
+  }
+);
+
+/**
+ * GET all participants in a conversation given conversationID
+ *
+ * [{userID, username, firstName, lastName}]
+ */
+
+app.get(
+  '/api/pigeon/conversations/participants/:conversationID',
+  async (req, res) => {
+    const { conversationID } = req.params;
+    const sql = `
+    SELECT "conversations"."userID", "users"."username", "users"."firstName", "users"."lastName"
+    FROM "conversations"
+    JOIN "users" ON "conversations"."userID" = "users"."userID"
+    WHERE "conversationID" = $1;`;
+    const params = [conversationID];
+    const result = await db.query(sql, params);
+    res.json(result.rows);
+  }
+);
 
 // Get all messages in a conversation
 app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
@@ -277,7 +305,7 @@ io.on('connection', (socket) => {
    * New Private Message is Requested
    *
    * Creates new conversation
-   * If client is online, emit conversation-created event with the conversationID
+   * If client is online, emit conversation-created event with the conversationID to update the client view
    * Emit conversation-list-update event to other user
    */
 
@@ -315,11 +343,7 @@ io.on('connection', (socket) => {
     let sql = `
     INSERT INTO "messages" ("conversationID", "userID", "messageContent")
     VALUES ($1, $2, $3)`;
-    let params = [
-      conversationID,
-      userID,
-      `Message from ${username} ` + messageContent,
-    ];
+    let params = [conversationID, userID, `${username}: ${messageContent}`];
     await db.query(sql, params);
 
     // Get conversation userID's, If match active SocketClient userID's, emit to them

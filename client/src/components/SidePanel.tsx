@@ -151,7 +151,11 @@ function PanelBody({ view }: BodyProps) {
             ? 'bg-[#424549] text-white'
             : 'text-[#ADADAD]')
         }>
-        {chat.conversationID}
+        {chat.participants[0].userID === userID
+          ? chat.participants[1].firstName + ' ' + chat.participants[1].lastName
+          : chat.participants[0].firstName +
+            ' ' +
+            chat.participants[0].lastName}
       </div>
     ));
 
