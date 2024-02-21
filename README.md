@@ -1,4 +1,4 @@
-# Pigeon
+# [Pigeon](https://www.pigeonchat.xyz/)
 
 A full stack web app for instant messaging using TypeScript, React.JS, Express.JS, Node.JS, PostgreSQL, Socket.IO, Tailwind CSS.
 
