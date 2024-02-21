@@ -5,10 +5,10 @@ A full stack web app for instant messaging using TypeScript, React.JS, Express.J
 Live Deployment: https://www.pigeonchat.xyz/
 
 ## Guest Accounts for Testing
-**user:** username
+**user:** username <br/>
 **pass:** password
 
-**user:** henry
+**user:** henry <br/>
 **pass:** pham
 
 ## Demo 
