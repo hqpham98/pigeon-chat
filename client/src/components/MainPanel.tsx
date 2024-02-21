@@ -1,10 +1,29 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { HomeContext, HomeContextValues } from './HomeContext';
-import { Message } from '../lib/types';
+import { Conversation, Message } from '../lib/types';
 import { AppContext, AppContextValues } from './AppContext';
 
 export function MainPanel() {
   const homeContext: HomeContextValues = useContext(HomeContext);
+  const appContext = useContext(AppContext);
+  const [chatName, setChatName] = useState('');
+  const { currentChat, chats } = homeContext;
+
+  useEffect(() => {
+    const current = chats.filter((chat: Conversation) => {
+      return currentChat === chat.conversationID;
+    })[0];
+
+    if (current) {
+      const user1 = current.participants[0];
+      const user2 = current.participants[1];
+      if (user1.userID === appContext.user?.userID) {
+        setChatName(`${user2.firstName} ${user2.lastName}`);
+      } else {
+        setChatName(`${user1.firstName} ${user1.lastName}`);
+      }
+    }
+  }, [currentChat, chats]);
 
   return (
     //Container
@@ -12,13 +31,13 @@ export function MainPanel() {
       {/* Header */}
       <div className="flex h-14 py-2 px-4 border-solid border-[#2E3034] border-b-2 ">
         <h1 className="text-white font-bold text-2xl basis-[50%] self-center">
-          {homeContext.currentChat}
+          {chatName}
         </h1>
       </div>
       {/* Panel Body */}
       <div className="min-h-96 h-[calc(100vh-3.5rem)] flex flex-col">
         <MessageArea />
-        <InputArea />
+        <InputArea chatName={chatName} />
       </div>
     </div>
   );
@@ -38,8 +57,10 @@ function MessageArea() {
     </div>
   );
 }
-
-function InputArea() {
+type InputProps = {
+  chatName: string;
+};
+function InputArea({ chatName }: InputProps) {
   const appContext: AppContextValues = useContext(AppContext);
   const homeContext: HomeContextValues = useContext(HomeContext);
   const { currentChat, message, setMessage, socket } = homeContext;
@@ -57,7 +78,7 @@ function InputArea() {
     <div className="min-h-[4.5rem] flex p-4">
       <input
         type="text"
-        placeholder={`Message ${currentChat}`}
+        placeholder={chatName && `Message ${chatName}`}
         onChange={(event) => {
           setMessage(event.currentTarget.value);
         }}

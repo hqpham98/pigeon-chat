@@ -10,6 +10,7 @@ import {
 import { View, Conversation, Person, FriendRequest } from '../lib/types';
 import { HomeContext, HomeContextValues } from './HomeContext';
 import { AddFriendModal } from './AddFriendModal';
+import { NewMessageModal } from './NewMessageModal';
 import { useContext, useState } from 'react';
 import { AppContext, AppContextValues } from './AppContext';
 
@@ -20,11 +21,13 @@ type SideProps = {
 
 export function SidePanel({ view, changeView }: SideProps) {
   const [viewFriendModal, setViewFriendModal] = useState(false);
+  const [viewMessageModal, setViewMessageModal] = useState(false);
 
   return (
     // Container
     <div>
       {viewFriendModal && <AddFriendModal viewModal={setViewFriendModal} />}
+      {viewMessageModal && <NewMessageModal viewModal={setViewMessageModal} />}
       {/* Header */}
       <div className="h-14 py-2 px-4 border-solid border-[#2E3034] border-b-2 flex">
         <h1 className="text-white font-bold text-2xl basis-[50%] self-center">
@@ -35,7 +38,8 @@ export function SidePanel({ view, changeView }: SideProps) {
           <HeaderButtons
             view={view}
             changeView={changeView}
-            modalView={setViewFriendModal}
+            friendModalView={setViewFriendModal}
+            messageModalView={setViewMessageModal}
           />
         </div>
       </div>
@@ -51,10 +55,16 @@ export function SidePanel({ view, changeView }: SideProps) {
 type HeaderProps = {
   view: View;
   changeView: (v: View) => void;
-  modalView: (x: boolean) => void;
+  friendModalView: (x: boolean) => void;
+  messageModalView: (x: boolean) => void;
 };
 
-function HeaderButtons({ view, changeView, modalView }: HeaderProps) {
+function HeaderButtons({
+  view,
+  changeView,
+  friendModalView,
+  messageModalView,
+}: HeaderProps) {
   if (view === 'Chats') {
     return (
       <>
@@ -67,6 +77,7 @@ function HeaderButtons({ view, changeView, modalView }: HeaderProps) {
         <FaPenToSquare
           className=" cursor-pointer ml-4 text-2xl self-center"
           style={{ color: '#FFFFFF' }}
+          onClick={() => messageModalView(true)}
         />
       </>
     );
@@ -87,7 +98,7 @@ function HeaderButtons({ view, changeView, modalView }: HeaderProps) {
         <FaUserPlus
           className="cursor-pointer ml-4 text-2xl self-center"
           style={{ color: '#FFFFFF' }}
-          onClick={() => modalView(true)}
+          onClick={() => friendModalView(true)}
         />
       </>
     );
@@ -140,7 +151,11 @@ function PanelBody({ view }: BodyProps) {
             ? 'bg-[#424549] text-white'
             : 'text-[#ADADAD]')
         }>
-        {chat.conversationID}
+        {chat.participants[0].userID === userID
+          ? chat.participants[1].firstName + ' ' + chat.participants[1].lastName
+          : chat.participants[0].firstName +
+            ' ' +
+            chat.participants[0].lastName}
       </div>
     ));
 

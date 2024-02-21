@@ -5,6 +5,10 @@ export type Message = {
   messageContent: string;
 };
 
+export type PrivateMessageRequest = {
+  userID1: number;
+  userID2: number;
+};
 export type SocketClientDict = Record<string, number>;
 export type FriendRequest = {
   senderID: number;

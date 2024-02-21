@@ -3,8 +3,11 @@ import { useState, useEffect, useContext } from 'react';
 import {
   View,
   ConversationID,
+  ConversationIDObject,
   SocketPayload,
   FriendRequest,
+  Conversation,
+  Person,
 } from '../lib/types';
 import { MainPanel } from '../components/MainPanel';
 import { SidePanel } from '../components/SidePanel';
@@ -16,7 +19,7 @@ export function Home() {
   const [message, setMessage] = useState('');
   const [currentMessages, setCurrentMessages] = useState([]);
   const [currentChat, setCurrentChat] = useState<ConversationID>('');
-  const [chats, setChats] = useState([]); //create a conversationName in the db, not just id
+  const [chats, setChats] = useState<Conversation[]>([]); //create a conversationName in the db, not just id
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [currentChatLoaded, setCurrentChatLoaded] = useState(false);
@@ -25,6 +28,7 @@ export function Home() {
   const [requestReceived, setRequestReceived] = useState(false); //Toggle triggers useEffects
   const [messageEvent, setMessageEvent] = useState(false); //Toggle triggers useEffects
   const [friendEvent, setFriendEvent] = useState(false); //Toggle triggers useEffects
+  const [convoEvent, setConvoEvent] = useState(false); //Toggle triggers useEffects
   const [socket, setSocket] = useState<Socket>();
   const appContext = useContext(AppContext);
 
@@ -81,7 +85,7 @@ export function Home() {
     });
     /**
      * friend-list-update
-     *
+     * Toggle setFriendEvent state to trigger useEffect for friend list reload
      */
     socket.on('friend-list-update', () => {
       setFriendEvent((prev) => !prev);
@@ -93,6 +97,25 @@ export function Home() {
     socket.on('friend-request-update', () => {
       setRequestReceived((prev) => !prev);
     });
+
+    /**
+     * conversation-created
+     * Toggle setConvoEvent state to trigger useEffect for conversation list reload
+     */
+    socket.on('conversation-created', (convo: ConversationID) => {
+      setCurrentChat(convo);
+      setConvoEvent((prev) => !prev);
+    });
+
+    /**
+     * conversation-list-update
+     * Toggle setConvoEvent state to trigger useEffect for conversation list reload
+     */
+
+    socket.on('conversation-list-update', () => {
+      setConvoEvent((prev) => !prev);
+    });
+
     /**
      * Log all Socket events listened
      */
@@ -105,24 +128,35 @@ export function Home() {
   }, [socket, currentChat]);
 
   /**
-   * Load conversations on mount
+   * Load conversations on mount and on conversation events.
    */
   useEffect(() => {
     async function getChats() {
       console.log('getChats ran');
       try {
         const res = await fetch(
-          `/api/pigeon/conversations/${appContext.user?.userID}`
+          `/api/pigeon/conversations/conversationids/${appContext.user?.userID}`
         );
-        const chats = await res.json();
-        setChats(chats);
+        const convoIDList: ConversationIDObject[] = await res.json();
+        const conversationsList: Conversation[] = [];
+        for (let i = 0; i < convoIDList.length; i++) {
+          const res = await fetch(
+            `/api/pigeon/conversations/participants/${convoIDList[i].conversationID}`
+          );
+          const participants: Person[] = await res.json();
+          conversationsList.push({
+            conversationID: convoIDList[i].conversationID,
+            participants,
+          });
+        }
+        setChats(conversationsList);
         setChatsLoaded(true);
       } catch (err) {
         console.log(err);
       }
     }
     getChats();
-  }, []);
+  }, [convoEvent]);
 
   /**
    * Load Friends List on mount or friendEvent toggled

@@ -1,8 +1,7 @@
-import { Socket } from 'socket.io-client';
 import { HomeContext, HomeContextValues } from './HomeContext';
 import { AppContext, AppContextValues } from './AppContext';
 import { useContext, useEffect, useState } from 'react';
-import { Person, FriendRequest } from '../lib/types';
+import { Person } from '../lib/types';
 
 type FriendModalProps = {
   viewModal: (x: boolean) => void;
@@ -56,11 +55,11 @@ export function AddFriendModal({ viewModal }: FriendModalProps) {
   return (
     // Background
     <div
-      className="absolute top-0 bottom-0 left-0 right-0"
+      className="absolute top-0 bottom-0 left-0 right-0 flex justify-center"
       onClick={() => viewModal(false)}>
       {/* Modal */}
       <div
-        className="absolute flex justify-center left-0 right-0 top-0 bottom-0 m-auto h-28 max-h-32 w-72 bg-[#1F2124] rounded px-4"
+        className="absolute flex justify-center self-center m-auto w-72 py-4 bg-[#1F2124] rounded px-4"
         onClick={(event) => event.stopPropagation()}>
         <div className="self-center w-full">
           <h1 className="font-medium text-white text-lg pb-2">
@@ -73,8 +72,6 @@ export function AddFriendModal({ viewModal }: FriendModalProps) {
             onChange={(e) => setFriendName(e.currentTarget.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
-                //if Request succeeds, hide modal
-                //Else, display error code
                 if (!loading) {
                   setModalMessage('');
                   setLoading(true);
