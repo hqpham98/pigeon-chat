@@ -25,6 +25,7 @@ export function Home() {
   const [requestReceived, setRequestReceived] = useState(false); //Toggle triggers useEffects
   const [messageEvent, setMessageEvent] = useState(false); //Toggle triggers useEffects
   const [friendEvent, setFriendEvent] = useState(false); //Toggle triggers useEffects
+  const [convoEvent, setConvoEvent] = useState(false); //Toggle triggers useEffects
   const [socket, setSocket] = useState<Socket>();
   const appContext = useContext(AppContext);
 
@@ -93,6 +94,25 @@ export function Home() {
     socket.on('friend-request-update', () => {
       setRequestReceived((prev) => !prev);
     });
+
+    /**
+     * conversation-created
+     * Toggle setConvoEvent state to trigger useEffect for conversation list reload
+     */
+    socket.on('conversation-created', (convo: ConversationID) => {
+      setConvoEvent((prev) => !prev);
+      setCurrentChat(convo);
+    });
+
+    /**
+     * conversation-list-update
+     * Toggle setConvoEvent state to trigger useEffect for conversation list reload
+     */
+
+    socket.on('conversation-list-update', () => {
+      setConvoEvent((prev) => !prev);
+    });
+
     /**
      * Log all Socket events listened
      */
@@ -105,9 +125,7 @@ export function Home() {
   }, [socket, currentChat]);
 
   /**
-   * Load conversations on mount
-   *
-   * TODO: And load on conversation event
+   * Load conversations on mount and on conversation events.
    */
   useEffect(() => {
     async function getChats() {
@@ -124,7 +142,7 @@ export function Home() {
       }
     }
     getChats();
-  }, []);
+  }, [convoEvent]);
 
   /**
    * Load Friends List on mount or friendEvent toggled

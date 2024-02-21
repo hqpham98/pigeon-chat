@@ -74,12 +74,13 @@ function SearchResults({ results, viewModal }: ResultsProps) {
   const result = results.map((p: Person) => (
     <div
       className="flex justify-between pt-2 text-[#ADADAD] hover:text-white cursor-pointer"
-      onClick={() =>
+      onClick={() => {
         socket?.emit('private-message-request', {
           userID1: user?.userID,
           userID2: p.userID,
-        })
-      }
+        });
+        viewModal(false);
+      }}
       key={p.userID}>
       <div>
         {p.firstName} {p.lastName}

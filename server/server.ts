@@ -276,8 +276,9 @@ io.on('connection', (socket) => {
   /**
    * New Private Message is Requested
    *
-   * Create new conversation
+   * Creates new conversation
    * If client is online, emit conversation-created event with the conversationID
+   * Emit conversation-list-update event to other user
    */
 
   socket.on(
@@ -290,9 +291,13 @@ io.on('connection', (socket) => {
         VALUES ($1, $2), ($1, $3)`;
       const params = [convoID, userID1, userID2];
       await db.query(sql, params);
-      const client = socketClientDict['' + userID1];
-      if (client !== undefined) {
-        io.to('' + client).emit('conversation-created', convoID);
+      const client1 = socketClientDict['' + userID1];
+      const client2 = socketClientDict['' + userID2];
+      if (client1 !== undefined) {
+        io.to('' + client1).emit('conversation-created', convoID);
+      }
+      if (client2 !== undefined) {
+        io.to('' + client2).emit('conversation-list-update');
       }
     }
   );
