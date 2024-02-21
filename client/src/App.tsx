@@ -1,9 +1,9 @@
 // import { useEffect, useState } from 'react';
 import './App.css';
-import { LandingPage } from './pages/LandingPage';
+// import { LandingPage } from './pages/LandingPage';
 import { SignupForm } from './pages/SignupForm';
 import { SigninForm } from './pages/SigninForm';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { User, Auth } from './lib/types';
 import { AppContext } from './components/AppContext';
 import { Home } from './pages/Home';
@@ -46,7 +46,10 @@ export default function App() {
   return (
     <AppContext.Provider value={contextValue}>
       <Routes>
-        <Route path="/" element={loggedIn ? <Home /> : <LandingPage />} />
+        <Route
+          path="/"
+          element={loggedIn ? <Home /> : <Navigate to="/login" />}
+        />
         <Route path="/register" element={<SignupForm />} />
         <Route path="/login" element={<SigninForm />} />
       </Routes>
