@@ -20,8 +20,8 @@ export function NewMessageModal({ viewModal }: MessageModalProps) {
         (p: Person) =>
           `${p.firstName} ${p.lastName}`
             .toLowerCase()
-            .startsWith(searchQuery) ||
-          `${p.username}`.toLowerCase().startsWith(searchQuery)
+            .startsWith(searchQuery.toLowerCase()) ||
+          `${p.username}`.toLowerCase().startsWith(searchQuery.toLowerCase())
       )
     );
   }, [searchQuery]);
