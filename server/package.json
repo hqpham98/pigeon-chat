@@ -4,8 +4,8 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "ts-node-esm server.ts",
-    "dev": "nodemon server.ts",
+    "start": "tsx server.ts",
+    "dev": "tsx watch server.ts",
     "lint": "eslint . --ext ts,js --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
