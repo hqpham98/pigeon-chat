@@ -46,7 +46,7 @@ const io = new Server(server, {
     origin:
       process.env.NODE_ENV === 'production'
         ? 'https://www.pigeonchat.xyz/'
-        : 'http://localhost:5173',
+        : ['http://localhost:5173', 'http://localhost:5174'],
   },
 });
 
