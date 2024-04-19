@@ -27,13 +27,10 @@ const connectionString =
 
 const db = new pg.Pool({
   connectionString,
-  ssl:
-    process.env.NODE_ENV === 'production'
-      ? {
-          rejectUnauthorized: false,
-          requestCert: true,
-        }
-      : false,
+  ssl: {
+    rejectUnauthorized: false,
+    requestCert: true,
+  },
 });
 
 const hashKey = process.env.TOKEN_SECRET;
