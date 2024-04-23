@@ -20,4 +20,4 @@ INSERT INTO "conversations" ("conversationID", "userID")
 VALUES ('0e8bbd6e-d33a-4f44-a8c7-414fec627f0d', 1), ('0e8bbd6e-d33a-4f44-a8c7-414fec627f0d', 2);
 
 INSERT INTO "messages" ("conversationID", "userID", "messageContent", "timestamp")
-VALUES  ('0e8bbd6e-d33a-4f44-a8c7-414fec627f0d', 1, 'username: Hi Henry', '2024-02-21T21:13:56.212Z'), ('0e8bbd6e-d33a-4f44-a8c7-414fec627f0d', 2, 'henry: Hi Bobby', '2024-02-21T21:14:32.235Z');
+VALUES  ('0e8bbd6e-d33a-4f44-a8c7-414fec627f0d', 1, 'bobby: Hi Henry', '2024-02-21T21:13:56.212Z'), ('0e8bbd6e-d33a-4f44-a8c7-414fec627f0d', 2, 'henry: Hi Bobby', '2024-02-21T21:14:32.235Z');
