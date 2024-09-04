@@ -15,13 +15,13 @@ import { AppContext } from '../components/AppContext';
 import { HomeContext, HomeContextValues } from '../components/HomeContext';
 
 export function Home() {
-  const [sideView, setSideView] = useState<View>('Chats');
+  const [sideView, setSideView] = useState<View>('Chats'); // Current selected view of the side panel. Chats, Friends, Requests, etc.
   const [message, setMessage] = useState('');
   const [currentMessages, setCurrentMessages] = useState([]); // String array of the messages for the selected conversation
   const [currentChat, setCurrentChat] = useState<ConversationID>(''); // ID of the selected conversation
   const [chats, setChats] = useState<Conversation[]>([]); // List of Conversation objects the user is apart of
   const [friends, setFriends] = useState([]);
-  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]); // List of pending FriendRequest objects
 
   // States pertaining to rendering components
   const [chatsLoaded, setChatsLoaded] = useState(false);
@@ -154,7 +154,8 @@ export function Home() {
   }, [convoEvent]);
 
   /**
-   * Load Friends List on mount or friendEvent toggled
+   * Load Friends List on mount or friendEvent toggled.
+   * Renders after friends list has loaded.
    */
   useEffect(() => {
     async function getFriends() {
