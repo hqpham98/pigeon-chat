@@ -77,7 +77,7 @@ function InputArea({ chatName }: InputProps) {
 
   function sendMessage() {
     const payload = {
-      ...appContext.user,
+      ...appContext.user, // user: User = {userID: number, username: string}
       conversationID: currentChat,
       messageContent: message,
     };

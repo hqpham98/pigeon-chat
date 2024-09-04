@@ -12,6 +12,11 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [isAuthorizing, setIsAuthorizing] = useState(true);
 
+  /**
+   * Renders page after auth token has been checked
+   *
+   * auth: {token: "", user: {userID: 0, username: ""}}
+   */
   useEffect(() => {
     const auth = localStorage.getItem('auth');
     if (auth) {
@@ -23,6 +28,7 @@ export default function App() {
     setIsAuthorizing(false);
   }, []);
 
+  // Do not render page if localStorage auth token hasn't been checked
   if (isAuthorizing) return null;
 
   function handleSignIn(auth: Auth) {
@@ -39,6 +45,7 @@ export default function App() {
     setLoggedIn(false);
   }
 
+  // Go to Home screen if auth token and user info found, else Login screen
   const contextValue = { user, token, handleSignIn, handleSignOut };
   return (
     <AppContext.Provider value={contextValue}>
