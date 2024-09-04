@@ -36,16 +36,19 @@ export function MainPanel() {
   }, [currentChat, chats, appContext.user?.userID]);
 
   return (
-    //Container
-    <div id="main-panel">
-      {/* Header */}
-      <div className="flex h-14 py-2 px-4 border-solid border-[#2E3034] border-b-2 ">
+    <div id="main-panel-container">
+      {/* Main Panel Header */}
+      <div
+        id="main-panel-header"
+        className="flex h-14 py-2 px-4 border-solid border-[#2E3034] border-b-2 ">
         <h1 className="text-white font-bold text-2xl basis-[50%] self-center">
           {chatName}
         </h1>
       </div>
-      {/* Panel Body */}
-      <div className="min-h-96 h-[calc(100vh-3.5rem)] flex flex-col">
+      {/* Main Panel Body */}
+      <div
+        id="main-panel-body"
+        className="min-h-96 h-[calc(100vh-3.5rem)] flex flex-col">
         <MessageArea />
         <InputArea chatName={chatName} />
       </div>
@@ -53,6 +56,7 @@ export function MainPanel() {
   );
 }
 
+// Renders the sent messages in a conversation
 function MessageArea() {
   const homeContext: HomeContextValues = useContext(HomeContext);
   const { currentMessages } = homeContext;
@@ -62,7 +66,7 @@ function MessageArea() {
     </div>
   ));
   return (
-    <div className="h-full overflow-auto p-4">
+    <div id="main-panel-message-area" className="h-full overflow-auto p-4">
       <ol>{result}</ol>
     </div>
   );
@@ -70,6 +74,8 @@ function MessageArea() {
 type InputProps = {
   chatName: string;
 };
+
+// Renders the input box to type new messages to be sent
 function InputArea({ chatName }: InputProps) {
   const appContext: AppContextValues = useContext(AppContext);
   const homeContext: HomeContextValues = useContext(HomeContext);
@@ -85,7 +91,7 @@ function InputArea({ chatName }: InputProps) {
     setMessage('');
   }
   return (
-    <div className="min-h-[4.5rem] flex p-4">
+    <div id="main-panel-input-area" className="min-h-[4.5rem] flex p-4">
       <input
         type="text"
         placeholder={chatName && `Message ${chatName}`}

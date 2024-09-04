@@ -202,10 +202,6 @@ function PanelBody({ view }: BodyProps) {
         </div>
       </div>
     ));
-    return (
-      <div id="side-panel" className="px-2 py-1">
-        {result}
-      </div>
-    );
+    return <div className="px-2 py-1">{result}</div>;
   }
 }

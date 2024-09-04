@@ -38,6 +38,7 @@ export function Home() {
 
   /**
    * Initialize Socket on mount
+   *
    */
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -50,6 +51,7 @@ export function Home() {
       socket?.disconnect();
       setSocket(undefined);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -121,7 +123,7 @@ export function Home() {
     return () => {
       socket.off();
     };
-  }, [socket, currentChat]);
+  }, [socket, currentChat, appContext.user]);
 
   /**
    * Load conversations on mount and on conversation events.
@@ -151,7 +153,7 @@ export function Home() {
       }
     }
     getChats();
-  }, [convoEvent]);
+  }, [appContext.user?.userID, convoEvent]);
 
   /**
    * Load Friends List on mount or friendEvent toggled.
@@ -171,7 +173,7 @@ export function Home() {
       }
     }
     getFriends();
-  }, [friendEvent]);
+  }, [appContext.user?.userID, friendEvent]);
 
   /**
    * Load Friend Requests list on mount or requestReceived toggled
@@ -189,7 +191,7 @@ export function Home() {
       }
     }
     getRequests();
-  }, [requestReceived]);
+  }, [appContext.user?.userID, requestReceived]);
 
   /**
    * Reload chat everytime current conversation view is changed or messageEvent state is changed

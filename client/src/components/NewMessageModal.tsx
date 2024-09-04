@@ -71,6 +71,7 @@ function SearchResults({ results, viewModal }: ResultsProps) {
 
   const result = results.map((p: Person) => (
     <div
+      id="new-message-search-results"
       className="flex justify-between pt-2 text-[#ADADAD] hover:text-white cursor-pointer"
       onClick={() => {
         socket?.emit('private-message-request', {
