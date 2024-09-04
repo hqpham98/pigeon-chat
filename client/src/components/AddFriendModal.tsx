@@ -11,30 +11,32 @@ export function AddFriendModal({ viewModal }: FriendModalProps) {
   const homeContext: HomeContextValues = useContext(HomeContext);
   const appContext: AppContextValues = useContext(AppContext);
 
-  const [friendName, setFriendName] = useState('');
-  const [enterPressed, setEnterPressed] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+  const [friendName, setFriendName] = useState(''); // The inputted username
+  const [enterPressed, setEnterPressed] = useState(false); // Toggling enterPressed state triggers a db lookup for inputted username
+  const [loading, setLoading] = useState(false); // Controls display of search results upon pressing Enter button
+  const [modalMessage, setModalMessage] = useState(''); // Modal will display Error message upon unsuccessful db lookup
 
   const { socket } = homeContext;
   /**
-   * Check database for inputted username
+   * Check database for inputted username everytime Enter is pressed
+   *
+   * TODO:  If already friends, display error message
+   * TODO:  If request already exists, display error message
    */
   useEffect(() => {
     async function sendRequest(username: string) {
       try {
         const res = await fetch(`/api/pigeon/users/${username}`);
         const user: Person[] = await res.json();
-        console.log('user', user);
+
         if (loading) {
           setLoading(false);
+
           // User does not exist
           if (!user.length) {
             setModalMessage(`User doesn't exist.`);
           } else {
             // User does exist
-            //TODO:  If already friends, display error message
-            //TODO:  If request already exists, display error message
 
             // Send friend request to Socket server
             const payload = {
@@ -50,15 +52,17 @@ export function AddFriendModal({ viewModal }: FriendModalProps) {
       }
     }
     sendRequest(friendName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enterPressed]);
 
   return (
-    // Background
+    // Invisible Background
     <div
       className="absolute top-0 bottom-0 left-0 right-0 flex justify-center"
       onClick={() => viewModal(false)}>
       {/* Modal */}
       <div
+        id="add-friend-modal"
         className="absolute flex justify-center self-center m-auto w-72 py-4 bg-[#1F2124] rounded px-4"
         onClick={(event) => event.stopPropagation()}>
         <div className="self-center w-full">

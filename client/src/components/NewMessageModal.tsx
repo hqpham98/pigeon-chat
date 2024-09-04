@@ -9,11 +9,12 @@ type MessageModalProps = {
 
 export function NewMessageModal({ viewModal }: MessageModalProps) {
   const homeContext: HomeContextValues = useContext(HomeContext);
-  const { friends } = homeContext;
+  const { friends } = homeContext; // List of Person's that the user is friends with
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [results, setResults] = useState<Person[]>([]);
+  const [searchQuery, setSearchQuery] = useState(''); // The current value of the input box to be used for searching for friend names
+  const [results, setResults] = useState<Person[]>([]); // List of Person's that match the search query
 
+  // Re-render the results as the user is typing based on the current friends list.
   useEffect(() => {
     setResults(
       friends.filter(
@@ -24,10 +25,9 @@ export function NewMessageModal({ viewModal }: MessageModalProps) {
           `${p.username}`.toLowerCase().startsWith(searchQuery.toLowerCase())
       )
     );
-  }, [searchQuery]);
+  }, [searchQuery, friends]);
 
   return (
-    // Background
     <div
       className="absolute top-0 bottom-0 left-0 right-0 flex justify-center"
       onClick={() => viewModal(false)}>
@@ -71,6 +71,7 @@ function SearchResults({ results, viewModal }: ResultsProps) {
 
   const result = results.map((p: Person) => (
     <div
+      id="new-message-search-results"
       className="flex justify-between pt-2 text-[#ADADAD] hover:text-white cursor-pointer"
       onClick={() => {
         socket?.emit('private-message-request', {

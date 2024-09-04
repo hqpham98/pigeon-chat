@@ -108,7 +108,7 @@ app.get(
   }
 );
 
-// Get all messages in a conversation
+// GET all messages in a conversation
 app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
   const { conversationID } = req.params;
   const sql = `
@@ -119,11 +119,10 @@ app.get('/api/pigeon/messages/:conversationID', async (req, res) => {
     ORDER by "timestamp" ASC;`;
   const params = [conversationID];
   const result = await db.query(sql, params);
-  console.log('received get');
   res.json(result.rows);
 });
 
-// Get all friends (userID and firstName) for userID
+// GET all friends (userID and firstName) for userID
 app.get('/api/pigeon/friendships/:userID', async (req, res) => {
   const { userID } = req.params;
   const sql = `
@@ -137,7 +136,7 @@ app.get('/api/pigeon/friendships/:userID', async (req, res) => {
 });
 
 /**
- * Get user info
+ * GET user info
  * Given username, get Person (userID, username, firstName, lastName)
  */
 
@@ -251,7 +250,7 @@ io.on('connection', (socket) => {
   io.to(socket.id).emit('socket-init-request', 'hello');
   socket.on('socket-init-response', (client) => {
     socketClientDict['' + client.userID] = client.socketID;
-    console.log(`hello ${client.userID}`);
+    console.log(`hello userID ${client.userID}`);
   });
   socket.on('disconnect', () => {
     console.log('user disconnected');
