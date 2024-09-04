@@ -16,9 +16,9 @@ export function MainPanel() {
    */
   useEffect(() => {
     // Look through the list of Conversation objects and get the first result that matches the conversation ID.
-    const current = chats.filter((chat: Conversation) => {
-      currentChat === chat.conversationID;
-    })[0];
+    const current = chats.filter(
+      (chat: Conversation) => currentChat === chat.conversationID
+    )[0];
 
     // Only renders messages if there is a conversation currently selected
     if (current) {
