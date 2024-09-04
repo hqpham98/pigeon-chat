@@ -50,7 +50,12 @@ const io = new Server(server, {
   },
 });
 
-// List of active socket connections
+/**
+ * Record of all active Socket connections with the server.
+ *
+ * socketClientDict[userID] = socketID
+ */
+
 const socketClientDict: SocketClientDict = {};
 
 // Create paths for static directories
@@ -67,6 +72,7 @@ app.use(express.json());
  *
  * [{conversationID}]
  */
+
 app.get(
   '/api/pigeon/conversations/conversationids/:userID',
   async (req, res) => {
