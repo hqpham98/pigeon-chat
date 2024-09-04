@@ -1,6 +1,3 @@
-// import { useEffect, useState } from 'react';
-import './App.css';
-// import { LandingPage } from './pages/LandingPage';
 import { SignupForm } from './pages/SignupForm';
 import { SigninForm } from './pages/SigninForm';
 import { Route, Routes, Navigate } from 'react-router-dom';
