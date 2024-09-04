@@ -7,23 +7,33 @@ export function MainPanel() {
   const homeContext: HomeContextValues = useContext(HomeContext);
   const appContext = useContext(AppContext);
   const [chatName, setChatName] = useState('');
-  const { currentChat, chats } = homeContext;
+  const { currentChat, chats } = homeContext; // Contains Conversation ID of the current chat and list of Conversation objects
 
+  /**
+   * Handle rendering of current conversation
+   *
+   * Re-rendered whenever current conversation ID is changed
+   */
   useEffect(() => {
+    // Look through the list of Conversation objects and get the first result that matches the conversation ID.
     const current = chats.filter((chat: Conversation) => {
-      return currentChat === chat.conversationID;
+      currentChat === chat.conversationID;
     })[0];
 
+    // Only renders messages if there is a conversation currently selected
     if (current) {
+      // Current implementation, only 2 participants per conversation
       const user1 = current.participants[0];
       const user2 = current.participants[1];
+
+      // If one of the userID's matches self, then name the chat to the other userID, assuming only 2 participants
       if (user1.userID === appContext.user?.userID) {
         setChatName(`${user2.firstName} ${user2.lastName}`);
       } else {
         setChatName(`${user1.firstName} ${user1.lastName}`);
       }
     }
-  }, [currentChat, chats]);
+  }, [currentChat, chats, appContext.user?.userID]);
 
   return (
     //Container
