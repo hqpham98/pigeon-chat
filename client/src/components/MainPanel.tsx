@@ -37,7 +37,7 @@ export function MainPanel() {
 
   return (
     //Container
-    <div>
+    <div id="main-panel">
       {/* Header */}
       <div className="flex h-14 py-2 px-4 border-solid border-[#2E3034] border-b-2 ">
         <h1 className="text-white font-bold text-2xl basis-[50%] self-center">
