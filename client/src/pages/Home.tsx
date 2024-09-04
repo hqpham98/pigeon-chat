@@ -17,19 +17,23 @@ import { HomeContext, HomeContextValues } from '../components/HomeContext';
 export function Home() {
   const [sideView, setSideView] = useState<View>('Chats');
   const [message, setMessage] = useState('');
-  const [currentMessages, setCurrentMessages] = useState([]);
-  const [currentChat, setCurrentChat] = useState<ConversationID>('');
-  const [chats, setChats] = useState<Conversation[]>([]); //create a conversationName in the db, not just id
+  const [currentMessages, setCurrentMessages] = useState([]); // String array of the messages for the selected conversation
+  const [currentChat, setCurrentChat] = useState<ConversationID>(''); // ID of the selected conversation
+  const [chats, setChats] = useState<Conversation[]>([]); // List of Conversation objects the user is apart of
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-  const [currentChatLoaded, setCurrentChatLoaded] = useState(false);
+
+  // States pertaining to rendering components
   const [chatsLoaded, setChatsLoaded] = useState(false);
   const [friendsLoaded, setFriendsLoaded] = useState(false);
-  const [requestReceived, setRequestReceived] = useState(false); //Toggle triggers useEffects
-  const [messageEvent, setMessageEvent] = useState(false); //Toggle triggers useEffects
-  const [friendEvent, setFriendEvent] = useState(false); //Toggle triggers useEffects
-  const [convoEvent, setConvoEvent] = useState(false); //Toggle triggers useEffects
+
+  // Toggle states to trigger useEffects relating to the corresponding event for real-time updates
+  const [requestReceived, setRequestReceived] = useState(false);
+  const [messageEvent, setMessageEvent] = useState(false);
+  const [friendEvent, setFriendEvent] = useState(false);
+  const [convoEvent, setConvoEvent] = useState(false);
   const [socket, setSocket] = useState<Socket>();
+
   const appContext = useContext(AppContext);
 
   /**
@@ -196,7 +200,6 @@ export function Home() {
         const res = await fetch(`/api/pigeon/messages/${currentChat}`);
         const messages = await res.json();
         setCurrentMessages(messages);
-        setCurrentChatLoaded(true);
       } catch (err) {
         console.log(err);
       }
@@ -215,8 +218,6 @@ export function Home() {
     chats,
     friends,
     friendRequests,
-    currentChatLoaded,
-    chatsLoaded,
     friendsLoaded,
     messageEvent,
     setCurrentChat,

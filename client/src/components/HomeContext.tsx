@@ -16,8 +16,6 @@ export type HomeContextValues = {
   chats: Conversation[];
   friends: Person[];
   friendRequests: FriendRequest[];
-  currentChatLoaded: boolean;
-  chatsLoaded: boolean;
   friendsLoaded: boolean;
   messageEvent: boolean;
   setCurrentChat: (x: ConversationID) => void;
@@ -32,8 +30,6 @@ export const HomeContext = createContext<HomeContextValues>({
   chats: [],
   friends: [],
   friendRequests: [],
-  currentChatLoaded: false,
-  chatsLoaded: false,
   friendsLoaded: false,
   messageEvent: false,
   setCurrentChat: () => undefined,
