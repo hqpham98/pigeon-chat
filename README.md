@@ -2,7 +2,7 @@
 
 A full stack web app for instant messaging using TypeScript, React.JS, Express.JS, Node.JS, PostgreSQL, Socket.IO, Tailwind CSS.
 
-Live Deployment: https://www.pigeonchat.xyz/
+Live Deployment: https://www.pigeonchat.xyz/ (Down as of March 12th, 2025. To be re-deployed.)
 
 ## Guest Accounts for Testing
 **user:** bobby <br/>
